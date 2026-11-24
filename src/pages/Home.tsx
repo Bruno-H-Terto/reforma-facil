@@ -7,6 +7,7 @@ import {
 } from "@untitledui/icons";
 import { Link } from "react-router-dom";
 import { Action, card, SectionTitle, Source } from "../components/ui";
+import { TopicCarousel } from "../components/TopicCarousel";
 import { sources, timeline, reviewed } from "../data/content";
 const features = [
   {
@@ -52,7 +53,54 @@ export function Home() {
             <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
-        <div className="flex flex-col justify-center bg-[#194955] p-7 sm:p-10">
+        <figure className="relative flex min-h-64 items-center justify-center bg-emerald-50 p-4 sm:p-7">
+          <img
+            src="/images/analytics.svg"
+            alt="Ilustração de profissionais analisando dados empresariais e gráficos"
+            width="500"
+            height="500"
+            className="max-h-80 w-full object-contain motion-safe:transition-transform motion-safe:duration-500 motion-safe:hover:scale-105 lg:max-h-96"
+          />
+          <figcaption className="absolute bottom-3 right-4 rounded bg-white/90 px-2 py-1 text-xs text-brand">
+            <a
+              className="underline"
+              href="https://storyset.com/illustration/business-analytics/pana"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Storyset / Freepik
+            </a>
+          </figcaption>
+        </figure>
+      </section>
+      <section>
+        <SectionTitle title="O que você quer fazer?">
+          Escolha o caminho mais útil para você.
+        </SectionTitle>
+        <div className="grid gap-4 md:grid-cols-3">
+          {features.map(({ icon: Icon, title, text, to }) => (
+            <Link
+              key={to}
+              to={to}
+              className={
+                card +
+                " group transition-colors hover:border-accent motion-safe:transition-all motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-md"
+              }
+            >
+              <Icon aria-hidden="true" className="mb-4 size-7 text-accent" />
+              <h3 className="font-semibold text-brand">{title}</h3>
+              <p className="mt-2 min-h-12 text-sm leading-relaxed text-slate-600">
+                {text}
+              </p>
+              <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-accent">
+                Acessar <ArrowRight className="size-4" aria-hidden="true" />
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+      <section className="grid min-w-0 gap-5 lg:grid-cols-[1fr_1fr]">
+        <div className="rounded-2xl bg-brand p-6 text-white sm:p-8">
           <p className="mb-4 flex items-center gap-2 text-sm font-semibold text-emerald-100">
             <Calendar className="size-5" aria-hidden="true" /> Onde estamos na
             transição
@@ -63,7 +111,7 @@ export function Home() {
             Prepare sistemas, acompanhe as obrigações e avalie os efeitos das
             novas regras.
           </p>
-          <div className="mt-6 grid grid-cols-4 gap-1 text-xs">
+          <div className="mt-6 grid grid-cols-2 gap-3 text-xs sm:grid-cols-4">
             {timeline.map((t, i) => (
               <div key={t.year}>
                 <div
@@ -83,58 +131,47 @@ export function Home() {
             Ver cronograma completo
           </Link>
         </div>
-      </section>
-      <section>
-        <SectionTitle title="O que você quer fazer?">
-          Escolha o caminho mais útil para você.
-        </SectionTitle>
-        <div className="grid gap-4 md:grid-cols-3">
-          {features.map(({ icon: Icon, title, text, to }) => (
-            <Link
-              key={to}
-              to={to}
-              className={card + " group hover:border-accent"}
-            >
-              <Icon aria-hidden="true" className="mb-4 size-7 text-accent" />
-              <h3 className="font-semibold text-brand">{title}</h3>
-              <p className="mt-2 min-h-12 text-sm leading-relaxed text-slate-600">
-                {text}
-              </p>
-              <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-accent">
-                Acessar <ArrowRight className="size-4" aria-hidden="true" />
-              </span>
-            </Link>
-          ))}
+
+        <div
+          className={
+            card + " grid min-w-0 items-center gap-4 sm:grid-cols-[1fr_0.65fr]"
+          }
+        >
+          <div>
+            <p className="text-xs font-semibold uppercase text-accent">
+              Para empresas
+            </p>
+            <h2 className="mt-2 text-xl font-semibold text-brand">
+              Sua empresa está no Simples?
+            </h2>
+            <p className="my-4 text-sm leading-relaxed text-slate-600">
+              Entenda a diferença entre o recolhimento dentro do DAS e o regime
+              regular de IBS e CBS.
+            </p>
+            <Action to="/simulador">Comparar cenários</Action>
+          </div>
+          <figure className="min-w-0">
+            <img
+              src="/images/finance.svg"
+              width="500"
+              height="500"
+              alt="Ilustração de planejamento financeiro"
+              className="mx-auto h-auto max-h-48 w-full object-contain"
+            />
+            <figcaption className="text-right text-xs text-slate-600">
+              <a
+                className="underline"
+                href="https://storyset.com/illustration/finance/pana"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Storyset / Freepik
+              </a>
+            </figcaption>
+          </figure>
         </div>
       </section>
-      <section className="grid gap-5 md:grid-cols-2">
-        <div className={card}>
-          <p className="text-xs font-semibold uppercase text-accent">
-            Para empresas
-          </p>
-          <h2 className="mt-2 text-xl font-semibold text-brand">
-            Sua empresa está no Simples?
-          </h2>
-          <p className="my-4 text-sm leading-relaxed text-slate-600">
-            Entenda a diferença entre o recolhimento dentro do DAS e o regime
-            regular de IBS e CBS.
-          </p>
-          <Action to="/simulador">Comparar cenários</Action>
-        </div>
-        <div className={card}>
-          <p className="text-xs font-semibold uppercase text-accent">
-            Atualização oficial · 18/11/2026
-          </p>
-          <h2 className="mt-2 text-xl font-semibold text-brand">
-            Receita e CGIBS alinham implementação
-          </h2>
-          <p className="my-4 text-sm leading-relaxed text-slate-600">
-            Órgãos discutiram próximos passos da reforma e a conformidade
-            tributária.
-          </p>
-          <Source url={sources.news}>Ler publicação</Source>
-        </div>
-      </section>
+      <TopicCarousel />
       <p className="text-xs text-slate-600">
         Conteúdo revisado em {reviewed}.{" "}
         <Source url={sources.overview}>Base oficial</Source>
