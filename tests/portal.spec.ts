@@ -209,3 +209,31 @@ test("formatação monetária brasileira preserva centavos e cálculos", async (
       .getByRole("link", { name: "Storyset / Freepik" }),
   ).toBeVisible();
 });
+test("estado selecionado dos cenários permanece visível e acompanha os valores", async ({
+  page,
+}) => {
+  await page.goto("/simulador");
+  const initial = page.getByRole("button", { name: "Exemplo inicial" });
+  const few = page.getByRole("button", { name: "Poucos créditos" });
+  const more = page.getByRole("button", { name: "Mais créditos" });
+  await expect(initial).toHaveAttribute("aria-pressed", "true");
+  await expect(few).toHaveAttribute("aria-pressed", "false");
+  const inactiveBackground = await few.evaluate(
+    (el) => getComputedStyle(el).backgroundColor,
+  );
+  await few.click();
+  await expect(few).toHaveAttribute("aria-pressed", "true");
+  await expect(initial).toHaveAttribute("aria-pressed", "false");
+  await page.getByRole("heading", { level: 1 }).hover();
+  await expect
+    .poll(() => few.evaluate((el) => getComputedStyle(el).backgroundColor))
+    .not.toBe(inactiveBackground);
+  await more.focus();
+  await page.keyboard.press("Enter");
+  await expect(more).toHaveAttribute("aria-pressed", "true");
+  await expect(few).toHaveAttribute("aria-pressed", "false");
+  await page.getByLabel("Créditos de IBS").fill("500");
+  await expect(more).toHaveAttribute("aria-pressed", "false");
+  await initial.click();
+  await expect(initial).toHaveAttribute("aria-pressed", "true");
+});

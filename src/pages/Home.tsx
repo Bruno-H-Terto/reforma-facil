@@ -47,7 +47,7 @@ export function Home() {
           </p>
           <Link
             to="/entenda"
-            className="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-semibold text-brand hover:bg-emerald-100"
+            className="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-semibold text-brand hover:bg-emerald-100 active:bg-emerald-200 transition-colors"
           >
             Começar pelo básico{" "}
             <ArrowRight className="size-4" aria-hidden="true" />
@@ -74,7 +74,7 @@ export function Home() {
               to={to}
               className={
                 card +
-                " group transition-colors hover:border-accent motion-safe:transition-all motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-md"
+                " group transition-colors hover:border-accent active:border-accent active:bg-emerald-50 motion-safe:active:translate-y-0 motion-safe:transition-all motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-md"
               }
             >
               <Icon aria-hidden="true" className="mb-4 size-7 text-accent" />

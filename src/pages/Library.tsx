@@ -63,7 +63,7 @@ export function Library() {
             Experimente outro termo ou selecione todas as categorias.
           </p>
           <button
-            className="font-semibold text-accent underline"
+            className="rounded font-semibold text-accent underline active:bg-emerald-100 active:text-brand transition-colors"
             onClick={() => {
               setQuery("");
               setCategory("Todos");

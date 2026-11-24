@@ -13,7 +13,7 @@ export const card =
 export const field =
   "w-full rounded-lg border border-slate-400 bg-white px-3 py-3 text-sm text-ink";
 export const primary =
-  "inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white hover:bg-brand transition-colors";
+  "inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white hover:bg-brand active:bg-brand active:ring-2 active:ring-accent/40 motion-safe:active:scale-[0.98] transition-colors motion-safe:transition-transform";
 export function PageIntro({
   label,
   title,
@@ -91,7 +91,7 @@ export function FAQ({ items }: { items: string[][] }) {
           <Heading>
             <Button
               slot="trigger"
-              className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left text-sm font-semibold text-brand hover:bg-paper"
+              className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left text-sm font-semibold text-brand hover:bg-paper active:bg-emerald-100 data-[pressed]:bg-emerald-100 group-data-[expanded]:bg-emerald-50 group-data-[expanded]:text-accent transition-colors"
             >
               {q}
               <ChevronDown

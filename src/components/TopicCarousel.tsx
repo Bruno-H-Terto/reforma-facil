@@ -49,7 +49,7 @@ export function TopicCarousel() {
             aria-label="Publicação anterior"
             disabled={!position.prev}
             onClick={() => api?.scrollPrev()}
-            className="grid size-11 place-items-center rounded-full border border-slate-300 bg-white text-brand transition-colors hover:bg-emerald-50 disabled:opacity-40"
+            className="grid size-11 place-items-center rounded-full border border-slate-300 bg-white text-brand transition-colors hover:bg-emerald-50 active:border-accent active:bg-accent active:text-white disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <ChevronLeft className="size-5" aria-hidden="true" />
           </button>
@@ -58,7 +58,7 @@ export function TopicCarousel() {
             aria-label="Próxima publicação"
             disabled={!position.next}
             onClick={() => api?.scrollNext()}
-            className="grid size-11 place-items-center rounded-full border border-slate-300 bg-white text-brand transition-colors hover:bg-emerald-50 disabled:opacity-40"
+            className="grid size-11 place-items-center rounded-full border border-slate-300 bg-white text-brand transition-colors hover:bg-emerald-50 active:border-accent active:bg-accent active:text-white disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <ChevronRight className="size-5" aria-hidden="true" />
           </button>
@@ -96,7 +96,7 @@ export function TopicCarousel() {
               aria-label={`Ir à posição ${i + 1}`}
               aria-current={position.index === i ? "true" : undefined}
               onClick={() => api?.scrollTo(i)}
-              className="grid size-9 place-items-center"
+              className="grid size-9 place-items-center rounded-full transition-colors hover:bg-emerald-50 active:bg-emerald-100"
             >
               <span
                 className={`h-2.5 rounded-full transition-all motion-reduce:transition-none ${position.index === i ? "w-6 bg-accent" : "w-2.5 bg-slate-400"}`}

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { CheckCircle } from "@untitledui/icons";
 import { CurrencyInput } from "../components/CurrencyInput";
 import {
   card,
@@ -106,8 +107,8 @@ function RateHelper() {
     ? effectiveRate(Number(rbt), Number(nominal), Number(deduction))
     : null;
   return (
-    <details className={card}>
-      <summary className="cursor-pointer font-semibold text-brand">
+    <details className={card + " group"}>
+      <summary className="cursor-pointer rounded-md font-semibold text-brand transition-colors hover:text-accent active:text-accent group-open:text-accent">
         Calculadora auxiliar: alíquota efetiva do DAS
       </summary>
       <p className="my-3 text-sm leading-relaxed text-slate-600">
@@ -169,6 +170,12 @@ function RateHelper() {
 }
 export function Simulator() {
   const [values, setValues] = useState(asStrings(defaults));
+  const selectedPreset = presets.find((preset) =>
+    Object.entries(preset.data).every(([key, value]) => {
+      const input = values[key as keyof Scenario];
+      return input !== "" && Number(input) === value;
+    }),
+  )?.name;
   const [result, setResult] = useState(defaults);
   const [dirty, setDirty] = useState(false);
   const c = compare(result);
@@ -251,14 +258,23 @@ export function Simulator() {
             <button
               key={p.name}
               type="button"
+              aria-pressed={selectedPreset === p.name}
               onClick={() => {
                 setValues(asStrings(p.data));
                 setResult(p.data);
                 setDirty(false);
               }}
-              className="rounded-xl border border-slate-200 bg-white p-4 text-left transition-colors hover:border-accent hover:bg-emerald-50"
+              className="rounded-xl border border-slate-200 bg-white p-4 text-left transition-colors hover:border-accent hover:bg-emerald-50 active:bg-emerald-100 aria-pressed:border-accent aria-pressed:bg-emerald-50 aria-pressed:ring-1 aria-pressed:ring-accent"
             >
-              <span className="block font-semibold text-brand">{p.name}</span>
+              <span className="flex items-center justify-between gap-2 font-semibold text-brand">
+                {p.name}
+                {selectedPreset === p.name && (
+                  <CheckCircle
+                    className="size-5 shrink-0 text-accent"
+                    aria-hidden="true"
+                  />
+                )}
+              </span>
               <span className="mt-1 block text-xs text-slate-600">
                 {p.text}
               </span>

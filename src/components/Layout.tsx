@@ -49,9 +49,9 @@ export function Layout() {
                 to={to}
                 end
                 className={({ isActive }) =>
-                  "py-2 font-medium border-b-2 " +
+                  "py-2 font-medium border-b-2 transition-colors active:bg-emerald-100 " +
                   (isActive
-                    ? "border-accent text-accent"
+                    ? "border-accent text-accent font-semibold"
                     : "border-transparent text-slate-600 hover:text-brand")
                 }
               >

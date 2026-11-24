@@ -19,3 +19,7 @@
 - Atribuição Storyset / Freepik concentrada no rodapé, sem sobreposição nas ilustrações.
 - Campos monetários em BRL com react-number-format, mantendo valores numéricos internos e centavos.
 - Validação: 23 testes aprovados; um teste redundante ignorado.
+
+## Estados interativos
+- Botões e links com feedback de pressão; cenários com estado persistente aria-pressed e indicação visual, sincronizado com as hipóteses do formulário. FAQ expandida destacada.
+- Validação: 25 testes aprovados, um redundante ignorado.
