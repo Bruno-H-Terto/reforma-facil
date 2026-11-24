@@ -61,16 +61,6 @@ export function Home() {
             height="500"
             className="max-h-80 w-full object-contain motion-safe:transition-transform motion-safe:duration-500 motion-safe:hover:scale-105 lg:max-h-96"
           />
-          <figcaption className="absolute bottom-3 right-4 rounded bg-white/90 px-2 py-1 text-xs text-brand">
-            <a
-              className="underline"
-              href="https://storyset.com/illustration/business-analytics/pana"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Storyset / Freepik
-            </a>
-          </figcaption>
         </figure>
       </section>
       <section>
@@ -158,16 +148,6 @@ export function Home() {
               alt="Ilustração de planejamento financeiro"
               className="mx-auto h-auto max-h-48 w-full object-contain"
             />
-            <figcaption className="text-right text-xs text-slate-600">
-              <a
-                className="underline"
-                href="https://storyset.com/illustration/finance/pana"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Storyset / Freepik
-              </a>
-            </figcaption>
           </figure>
         </div>
       </section>

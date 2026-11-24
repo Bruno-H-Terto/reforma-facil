@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { CurrencyInput } from "../components/CurrencyInput";
 import {
   card,
   field,
@@ -132,15 +133,23 @@ function RateHelper() {
         ].map((f) => (
           <label key={f.label} className="min-w-0 text-sm font-medium">
             {f.label}
-            <input
-              type="number"
-              min="0"
-              max={f.max}
-              step="0.01"
-              className={field + " mt-2"}
-              value={f.v}
-              onChange={(e) => f.set(e.target.value)}
-            />
+            {f.max === 100 ? (
+              <input
+                type="number"
+                min="0"
+                max={f.max}
+                step="0.01"
+                className={field + " mt-2"}
+                value={f.v}
+                onChange={(e) => f.set(e.target.value)}
+              />
+            ) : (
+              <CurrencyInput
+                value={f.v}
+                onValueChange={f.set}
+                className={field + " mt-2"}
+              />
+            )}
           </label>
         ))}
       </div>
@@ -278,20 +287,36 @@ export function Simulator() {
             {fields.map((f) => (
               <label key={f.key} className="block min-w-0 text-sm font-medium">
                 {f.label}
-                <input
-                  type="number"
-                  required
-                  min="0"
-                  max={f.max ?? 100000000000}
-                  step="0.01"
-                  value={values[f.key]}
-                  onChange={(e) => {
-                    setValues({ ...values, [f.key]: e.target.value });
-                    setDirty(true);
-                  }}
-                  className={field + " mt-2"}
-                  aria-describedby={f.key + "-help"}
-                />
+                {f.max === 100 ? (
+                  <input
+                    type="number"
+                    required
+                    min="0"
+                    max={f.max ?? 100000000000}
+                    step="0.01"
+                    value={values[f.key]}
+                    onChange={(e) => {
+                      setValues({ ...values, [f.key]: e.target.value });
+                      setDirty(true);
+                    }}
+                    className={field + " mt-2"}
+                    aria-describedby={f.key + "-help"}
+                  />
+                ) : (
+                  <CurrencyInput
+                    required
+                    value={values[f.key]}
+                    onValueChange={(value) => {
+                      setValues((previous) => ({
+                        ...previous,
+                        [f.key]: value,
+                      }));
+                      setDirty(true);
+                    }}
+                    className={field + " mt-2"}
+                    aria-describedby={f.key + "-help"}
+                  />
+                )}
                 <span
                   id={f.key + "-help"}
                   className="mt-1 block text-xs font-normal text-slate-600"

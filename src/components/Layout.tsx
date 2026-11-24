@@ -77,6 +77,18 @@ export function Layout() {
           <p className="mt-1">
             Revisão editorial: {reviewed}. Sem atualização automática.
           </p>
+          <p className="mt-3 text-xs">
+            Ilustrações por{" "}
+            <a
+              href="https://storyset.com/"
+              target="_blank"
+              rel="noreferrer"
+              className="underline underline-offset-2 hover:text-brand"
+            >
+              Storyset / Freepik
+            </a>
+            .
+          </p>
         </div>
       </footer>
     </>

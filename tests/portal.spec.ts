@@ -36,7 +36,7 @@ test("empresário encontra o cronograma e compara cenários", async ({
       .getByRole("region", { name: "Resultado estimado" })
       .getByText("R$ 2.000,00", { exact: true }),
   ).toBeVisible();
-  await page.getByLabel("Receita mensal para o DAS").fill("-1");
+  await page.getByLabel("Receita mensal para o DAS").fill("");
   await page.getByRole("button", { name: "Calcular cenários" }).click();
   expect(
     await page
@@ -176,4 +176,36 @@ test("créditos não são compensados entre IBS e CBS; memória e alíquota auxi
   await expect(page.getByText(/Revise os parâmetros/)).toBeVisible();
   await page.getByRole("button", { name: "Exemplo inicial" }).click();
   await expect(result.getByText("R$ 6.000,00", { exact: true })).toBeVisible();
+});
+
+test("formatação monetária brasileira preserva centavos e cálculos", async ({
+  page,
+}) => {
+  await page.goto("/simulador");
+  const revenue = page.getByLabel("Receita mensal para o DAS");
+  await expect(revenue).toHaveValue("R$ 50.000,00");
+  await expect(page.getByLabel("Créditos de IBS")).toHaveValue("R$ 1.000,00");
+  await revenue.fill("12345,67");
+  await revenue.blur();
+  await expect(revenue).toHaveValue("R$ 12.345,67");
+  await page.getByRole("button", { name: "Calcular cenários" }).click();
+  await expect(
+    page
+      .getByRole("region", { name: "Resultado estimado" })
+      .getByText("R$ 987,65", { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByText("Calculadora auxiliar: alíquota efetiva do DAS", { exact: true })
+    .click();
+  await expect(page.getByLabel("RBT12 (R$)")).toHaveValue("R$ 600.000,00");
+  await expect(page.getByLabel("Parcela a deduzir (R$)")).toHaveValue(
+    "R$ 12.000,00",
+  );
+  await page.goto("/");
+  await expect(page.locator("main figure a")).toHaveCount(0);
+  await expect(
+    page
+      .getByRole("contentinfo")
+      .getByRole("link", { name: "Storyset / Freepik" }),
+  ).toBeVisible();
 });

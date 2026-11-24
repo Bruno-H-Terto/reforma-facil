@@ -14,3 +14,8 @@
 - Comandos: npm run format:check; npm run lint; npm run build; npm run test:e2e.
 
 - Resultado final: 21 testes aprovados, um ignorado intencionalmente (matriz de tamanhos duplicada na configuração móvel), zero falhas.
+
+## Ajustes de acabamento
+- Atribuição Storyset / Freepik concentrada no rodapé, sem sobreposição nas ilustrações.
+- Campos monetários em BRL com react-number-format, mantendo valores numéricos internos e centavos.
+- Validação: 23 testes aprovados; um teste redundante ignorado.
