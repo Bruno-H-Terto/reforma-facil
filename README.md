@@ -25,3 +25,6 @@ Revisar fontes oficiais, datas, prazos e legislação antes de publicar. Atualiz
 
 ## Identidade
 Poppins, azul petróleo, verde, fundo neutro. React + TypeScript + Vite + Tailwind CSS, React Router, React Aria, Untitled UI Icons e Oxlint, seguindo a referência Nordion.
+
+## Iteração 02
+Consulte [docs/iteracao-02.md](docs/iteracao-02.md) para fontes legislativas, créditos de imagens, metodologia do simulador e matriz de responsividade.

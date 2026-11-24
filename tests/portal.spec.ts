@@ -11,21 +11,43 @@ test("empresário encontra o cronograma e compara cenários", async ({
   await expect(page).toHaveURL(/entenda#cronograma/);
   await expect(page.getByText("2033", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Explorar cenários" }).click();
-  await expect(page.getByText("R$ 4.000,00", { exact: true })).toBeVisible();
-  await expect(page.getByText("R$ 6.000,00", { exact: true })).toBeVisible();
-  await page.getByLabel("Base mensal hipotética").fill("10000");
-  await page.getByLabel("Créditos aproveitáveis estimados").fill("0");
+  await expect(
+    page
+      .getByRole("region", { name: "Resultado estimado" })
+      .getByText("R$ 4.000,00", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByRole("region", { name: "Resultado estimado" })
+      .getByText("R$ 6.000,00", { exact: true }),
+  ).toBeVisible();
+  await page.getByLabel("Receita mensal para o DAS").fill("10000");
+  await page.getByLabel("Base de operações IBS/CBS").fill("10000");
+  await page.getByLabel("Créditos de IBS").fill("0");
+  await page.getByLabel("Créditos de CBS").fill("0");
   await page.getByRole("button", { name: "Calcular cenários" }).click();
-  await expect(page.getByText("R$ 800,00", { exact: true })).toBeVisible();
-  await expect(page.getByText("R$ 2.000,00", { exact: true })).toBeVisible();
-  await page.getByLabel("Base mensal hipotética").fill("-1");
+  await expect(
+    page
+      .getByRole("region", { name: "Resultado estimado" })
+      .getByText("R$ 800,00", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByRole("region", { name: "Resultado estimado" })
+      .getByText("R$ 2.000,00", { exact: true }),
+  ).toBeVisible();
+  await page.getByLabel("Receita mensal para o DAS").fill("-1");
   await page.getByRole("button", { name: "Calcular cenários" }).click();
   expect(
     await page
-      .getByLabel("Base mensal hipotética")
+      .getByLabel("Receita mensal para o DAS")
       .evaluate((el: HTMLInputElement) => el.validity.valid),
   ).toBe(false);
-  await expect(page.getByText("R$ 800,00", { exact: true })).toBeVisible();
+  await expect(
+    page
+      .getByRole("region", { name: "Resultado estimado" })
+      .getByText("R$ 800,00", { exact: true }),
+  ).toBeVisible();
 });
 test("contador pesquisa legislação e recupera busca sem resultados", async ({
   page,
@@ -99,3 +121,59 @@ for (const route of [
     });
   });
 }
+test("carrossel, ilustrações e navegação reduzida", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  for (const img of await page.locator('img[src^="/images/"]').all()) {
+    await img.scrollIntoViewIfNeeded();
+    await expect
+      .poll(() =>
+        img.evaluate(
+          (el: HTMLImageElement) => el.complete && el.naturalWidth > 0,
+        ),
+      )
+      .toBe(true);
+  }
+  const carousel = page.getByRole("region", {
+    name: "Publicações em destaque",
+  });
+  const next = carousel.getByRole("button", { name: "Próxima publicação" });
+  await expect(next).toBeEnabled();
+  await next.click();
+  await expect(
+    carousel.getByRole("button", { name: "Ir à posição 2" }),
+  ).toHaveAttribute("aria-current", "true");
+  await carousel.getByRole("button", { name: "Publicação anterior" }).click();
+  await expect(
+    carousel.getByRole("button", { name: "Ir à posição 1" }),
+  ).toHaveAttribute("aria-current", "true");
+});
+test("créditos não são compensados entre IBS e CBS; memória e alíquota auxiliar", async ({
+  page,
+}) => {
+  await page.goto("/simulador");
+  await page.getByLabel("Créditos de IBS").fill("10000");
+  await page.getByLabel("Créditos de CBS").fill("0");
+  await page.getByRole("button", { name: "Calcular cenários" }).click();
+  const result = page.getByRole("region", { name: "Resultado estimado" });
+  await expect(
+    result.getByText("R$ 7.500,00", { exact: true }).first(),
+  ).toBeVisible();
+  await expect(result.getByText("R$ 5.000,00", { exact: true })).toBeVisible();
+  await expect(
+    result.getByText("R$ 7.500,00", { exact: true }).last(),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Memória de cálculo" }),
+  ).toBeVisible();
+  await page
+    .getByText("Calculadora auxiliar: alíquota efetiva do DAS", { exact: true })
+    .click();
+  await expect(
+    page.getByText("Alíquota efetiva: 8%", { exact: true }),
+  ).toBeVisible();
+  await page.getByLabel("RBT12 (R$)").fill("0");
+  await expect(page.getByText(/Revise os parâmetros/)).toBeVisible();
+  await page.getByRole("button", { name: "Exemplo inicial" }).click();
+  await expect(result.getByText("R$ 6.000,00", { exact: true })).toBeVisible();
+});
