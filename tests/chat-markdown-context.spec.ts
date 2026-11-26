@@ -128,15 +128,18 @@ test("botões de formatação atuam dentro do campo e o envio usa Markdown", asy
   await dialog.getByRole("button", { name: "Negrito" }).click();
   await expect(textbox.locator("strong")).toHaveText("Mensagem importante");
 
-  await textbox.press("End");
-  await textbox.press("Enter");
+  await dialog.getByRole("button", { name: "Enviar mensagem" }).click();
   await expect(dialog.getByText("Recebido.")).toBeVisible();
   expect(received).toBe("**Mensagem importante**");
 });
 
-test("Shift+Enter insere quebra de linha sem enviar", async ({ page }) => {
+test("Enter sempre quebra linha e envio acontece somente pelo botão", async ({
+  page,
+}) => {
   let received = "";
+  let requests = 0;
   await page.route("**/api/chat", (route) => {
+    requests += 1;
     received = route.request().postDataJSON().messages[0].content;
     return route.fulfill({
       status: 200,
@@ -146,13 +149,24 @@ test("Shift+Enter insere quebra de linha sem enviar", async ({ page }) => {
   });
   const { dialog, textbox } = await openChat(page);
   await textbox.fill("Primeira linha");
-  await textbox.press("Shift+Enter");
+  await textbox.press("Enter");
   await textbox.pressSequentially("Segunda linha");
+  await expect(textbox.locator("p")).toHaveCount(2);
   await expect(textbox).toContainText("Segunda linha");
-  expect(received).toBe("");
+  expect(requests).toBe(0);
+
+  // Também funciona com Shift+Enter, mas nenhum Enter deve enviar.
+  await textbox.press("Shift+Enter");
+  await textbox.pressSequentially("Terceira linha");
+  await expect(textbox).toContainText("Terceira linha");
+  expect(requests).toBe(0);
+
   await dialog.getByRole("button", { name: "Enviar mensagem" }).click();
   await expect(dialog.getByText("Recebido.")).toBeVisible();
-  expect(received).toMatch(/Primeira linha[\s\S]*Segunda linha/);
+  expect(requests).toBe(1);
+  expect(received).toMatch(
+    /Primeira linha[\s\S]*Segunda linha[\s\S]*Terceira linha/,
+  );
 });
 
 test("continuação envia respostas anteriores como contexto e não altera Markdown", async ({

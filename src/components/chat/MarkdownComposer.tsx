@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle } from "react";
 import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Markdown } from "@tiptap/markdown";
@@ -15,7 +15,6 @@ type Props = {
   initialMarkdown: string;
   disabled: boolean;
   onChange: (markdown: string) => void;
-  onSend: () => void;
 };
 
 /**
@@ -26,13 +25,7 @@ type Props = {
  * formatação ou enviar HTML para o backend.
  */
 export const MarkdownComposer = forwardRef<MarkdownComposerHandle, Props>(
-  function MarkdownComposer(
-    { initialMarkdown, disabled, onChange, onSend },
-    ref,
-  ) {
-    const sendRef = useRef(onSend);
-    sendRef.current = onSend;
-
+  function MarkdownComposer({ initialMarkdown, disabled, onChange }, ref) {
     const editor = useEditor({
       extensions: [
         StarterKit.configure({
@@ -54,19 +47,6 @@ export const MarkdownComposer = forwardRef<MarkdownComposerHandle, Props>(
           spellcheck: "true",
           className:
             "min-h-10 px-3 py-2 text-sm leading-relaxed text-ink outline-none",
-        },
-        handleKeyDown: (_view, event) => {
-          if (
-            event.key === "Enter" &&
-            !event.shiftKey &&
-            !event.isComposing &&
-            event.keyCode !== 229
-          ) {
-            event.preventDefault();
-            sendRef.current();
-            return true;
-          }
-          return false;
         },
       },
       onUpdate: ({ editor: current }) => onChange(current.getMarkdown()),

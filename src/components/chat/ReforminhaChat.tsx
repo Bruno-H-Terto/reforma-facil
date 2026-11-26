@@ -297,7 +297,6 @@ export function ReforminhaChat() {
                   initialMarkdown={draft}
                   disabled={busy}
                   onChange={setDraft}
-                  onSend={() => formRef.current?.requestSubmit()}
                 />
               </Suspense>
               <button
@@ -311,7 +310,7 @@ export function ReforminhaChat() {
             </div>
             <div className="mt-1 flex items-center justify-between gap-2">
               <p id="reforminha-editor-help" className="text-[11px] text-muted">
-                Formatação ao digitar · Enter envia · Shift+Enter quebra linha
+                Formatação ao digitar · Enter quebra linha · Envie pelo botão
                 {draft.length > 1800 && (
                   <span role="alert"> · Máximo de 1.800 caracteres</span>
                 )}

@@ -84,7 +84,9 @@ para negrito, itálico, título, listas e código. A formatação aparece
 diretamente durante a edição, sem abrir uma prévia separada. O editor
 converte o documento em Markdown antes do envio à API (não envia HTML).
 O código do editor é carregado sob demanda, quando o chat é aberto, e
-o rascunho é preservado quando o chat é recolhido.
+o rascunho é preservado quando o chat é recolhido. A tecla Enter insere
+uma nova linha tanto no desktop quanto no celular; o envio é realizado
+exclusivamente pelo botão de enviar.
 
 HTML fornecido pelo modelo não é renderizado, imagens externas não são
 carregadas e links clicáveis ficam restritos às rotas internas e às
