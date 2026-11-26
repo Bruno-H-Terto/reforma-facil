@@ -19,3 +19,41 @@ Reforma Clara: azul petróleo, verde moderado, fundo claro, contraste e tipograf
 - https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp227.htm
 - https://www.gov.br/receitafederal/pt-br/assuntos/noticias/2026/setembro/simples-nacional-2027-entenda-os-novos-prazos-e-faca-sua-escolha-com-consciencia-e-tranquilidade/
 - https://www.gov.br/receitafederal/pt-br/assuntos/noticias/2026/novembro/rfb-e-cgibs-alinham-proximos-passos-da-implementacao-da-reforma-e-reforcam-compromisso-com-a-conformidade-tributaria
+
+## Extensão de escopo — 25/11/2026
+Central de notícias com revisão editorial, classificação nacional/UF, filtros de período/tema e acesso a fontes oficiais. Seis casos de serviços, incluindo anexos III, IV e V, com alíquotas diferenciadas condicionais e referência CBS do TCU explicitamente provisória. A atualização automática de notícias depende de uma integração futura com fontes oficiais; não é simulada.
+
+## Extensão MEI — 25/11/2026
+Página específica para SIMEI, distinta dos anexos do Simples e das simulações regulares de IBS/CBS, com limite proporcional por ano, DAS oficial 2026, exemplos de remissão condicionada e notícias oficiais. Referência principal: LC 238/2026 e orientações da Receita Federal/PGFN.
+
+## Calculadoras por regime — 25/11/2026
+DAS de 2026 com faixas e deduções oficiais, fator R e aviso de sublimite; apuração trimestral de IRPJ/CSLL do Lucro Presumido e Real com memória de cálculo e limitações explícitas. Simulação de reforma permanece separada.
+
+## Glossário contextual — 25/11/2026
+Exibir as definições de IBS, CBS e IS logo na página inicial e os significados em versão compacta junto aos contextos de uso, sem exigir navegação prévia ao glossário.
+
+## Simulação rápida — 25/11/2026
+Priorizar a estimativa mensal de DAS com dados conhecidos pelo empresário. Exibir composição IBS/CBS dentro do total de 2027–2028; fórmulas e fontes em detalhes recolhidos; preservar modo avançado separado. Não estimar casos fora do escopo das cinco primeiras faixas ou com receitas sujeitas a tratamentos diferentes.
+
+## Implementação de IA e arquitetura — 26/11/2026
+
+A descrição inicial de IA como etapa futura acima é histórica. Nesta iteração
+foram implementados o widget público do Reforminha e o endpoint serverless
+`/api/chat` para Vercel, com DeepSeek configurável por variáveis de ambiente
+do servidor. A arquitetura utiliza `createAgent` e `tool()` do LangChain.js,
+schemas Zod, simulação com funções determinísticas do próprio portal,
+pesquisa oficial e explicações separadas para MEI, Simples, Lucro Presumido
+e Lucro Real. Ver `docs/chatbot-tools.md`.
+
+A interface apresenta expressões diferentes do mascote e uma página 404.
+O agente foi testado com modelos simulados e ferramentas reais; o uso efetivo
+da API DeepSeek ainda depende de credenciais e sua qualidade não foi validada.
+Publicação com custo de IA requer controle de abuso e consumo persistente.
+Não foram introduzidos armazenamento de conversas ou atualização editorial
+automática.
+
+O simulador concentra os fluxos Simples tradicional e híbrido em abas na
+mesma tela; o endereço legado `/simulador/avancado` redireciona para o modo
+de comparação. As alíquotas de IBS/CBS usadas na comparação do ano escolhido
+são exibidas, em vez de oferecidas para edição livre. Para 2028, a ferramenta
+não calcula CBS sem parâmetro oficialmente definido.
