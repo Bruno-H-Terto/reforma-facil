@@ -4,6 +4,7 @@ type CurrencyInputProps = {
   value: string;
   onValueChange: (value: string) => void;
   className: string;
+  id?: string;
   required?: boolean;
   "aria-describedby"?: string;
 };

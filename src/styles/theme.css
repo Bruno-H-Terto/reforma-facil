@@ -1,0 +1,36 @@
+@theme {
+  --font-sans: "Poppins", system-ui, sans-serif;
+  --color-brand: #102f49;
+  --color-brand-deep: #09253a;
+  --color-brand-mid: #16485e;
+  --color-accent: #20556d;
+  --color-gold: #f6c454;
+  --color-gold-hover: #ffda86;
+  --color-gold-pressed: #e6ac32;
+  --color-gold-ink: #80521a;
+  --color-ink: #182e40;
+  --color-muted: #4d5d6b;
+  --color-paper: #f5f0e8;
+  --color-surface: #fffcf7;
+  --color-soft: #e9eff2;
+  --color-faq: #eaeff1;
+  --color-line: #d4dce1;
+  --color-line-strong: #8495a1;
+  --color-on-dark: #e2edf4;
+  --text-display: clamp(2rem, 4.05vw, 3.75rem);
+  --text-display--line-height: 1.12;
+  --text-page: clamp(1.75rem, 3vw, 2.5rem);
+  --text-page--line-height: 1.2;
+  --text-section: clamp(1.5rem, 2.2vw, 2rem);
+  --text-section--line-height: 1.25;
+  --shadow-panel: 0 5px 22px rgb(16 47 73 / 0.07);
+  --animate-enter: enter 300ms ease-out both;
+  @keyframes enter {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
