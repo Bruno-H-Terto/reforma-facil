@@ -72,9 +72,7 @@ test("aviso regional é visível nos três regimes e não atribui alíquotas por
   await expect(notice).toContainText("2027 e 2028");
   await expect(notice).toContainText("2029");
   await expect(notice).toContainText("ICMS/ISS");
-  await expect(
-    notice.getByRole("link", { name: "Entenda o impacto regional." }),
-  ).toHaveAttribute("href", "/estados");
+  await expect(notice.getByRole("link")).toHaveCount(0);
 
   for (const regime of ["Lucro Presumido", "Lucro Real", "Simples Nacional"]) {
     await page.getByRole("tab", { name: regime }).click();

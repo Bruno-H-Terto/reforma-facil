@@ -104,13 +104,7 @@ export function QuickSimulator() {
         alíquota-padrão do IBS na transição é igual em todas as UFs, quando
         aplicável; selecionar outro estado, por si só, não altera o DAS
         estimado. A partir de 2029, a tributação poderá depender de alíquotas
-        regionais e regras específicas que ainda não integram estes cálculos.{" "}
-        <Link
-          to="/estados"
-          className="font-semibold text-accent underline underline-offset-2 hover:decoration-2"
-        >
-          Entenda o impacto regional.
-        </Link>
+        regionais e regras específicas que ainda não integram estes cálculos.
       </aside>
       <RegimeTabs
         items={simulatorTabs}

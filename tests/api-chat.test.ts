@@ -475,7 +475,8 @@ test("agente: prompt não autoriza cálculos regionais com alíquotas não defin
       .map((message) => JSON.stringify(message.content))
       .join("\n");
     assert.match(system, /\/simulador/);
-    assert.match(system, /\/estados/);
+    assert.match(system, /apenas a \/simulador/);
+    assert.doesNotMatch(system, /a \/estados para orientação regional/);
     assert.match(system, /2027 e 2028/);
     assert.match(system, /2029/);
     assert.match(system, /Não invente, estime nem substitua/);
