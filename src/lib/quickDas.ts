@@ -1,6 +1,6 @@
-import { shares2728 } from "../data/simplesTransition";
-import type { Annex } from "../data/taxTables";
-import { das } from "./taxes";
+import { shares2728 } from "../data/simplesTransition.js";
+import type { Annex } from "../data/taxTables.js";
+import { das } from "./taxes.js";
 const round = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 export function quickDas(
   annex: Annex,

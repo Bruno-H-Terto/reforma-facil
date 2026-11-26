@@ -14,7 +14,8 @@
     "typecheck:api": "tsc -p tsconfig.api.json --noEmit",
     "test:api": "node --import tsx --test tests/api-chat.test.ts",
     "dev:full": "npx vercel dev",
-    "demo:tool": "tsx scripts/demo-tool.ts"
+    "demo:tool": "tsx scripts/demo-tool.ts",
+    "check:server-esm": "node scripts/check-server-esm.mjs"
   },
   "dependencies": {
     "@fontsource/poppins": "^5.3.0",

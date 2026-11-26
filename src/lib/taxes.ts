@@ -1,4 +1,4 @@
-import { annexTables, ceilings, type Annex } from "../data/taxTables";
+import { annexTables, ceilings, type Annex } from "../data/taxTables.js";
 const round = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 export function das(annex: Annex, rbt12: number, monthly: number) {
   if (

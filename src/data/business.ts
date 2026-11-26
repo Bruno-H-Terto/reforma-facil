@@ -1,4 +1,4 @@
-import { sources } from "./content";
+import { sources } from "./content.js";
 export const legal = {
   simples: "https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp123.htm",
   junior: "https://legis.senado.leg.br/norma/602492/publicacao/15639320",

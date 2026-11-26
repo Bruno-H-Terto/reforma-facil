@@ -1,4 +1,4 @@
-import type { Annex } from "./taxTables";
+import type { Annex } from "./taxTables.js";
 // Resolução CGSN 196/2026, art. 3º, anexos I–V, vigência 2027–2028.
 // Percentuais da partilha do DAS (não sobre faturamento), faixas 1 a 5.
 // Anexo III faixas 3 e 4: 16,41% na resolução de 24/11/2026.
