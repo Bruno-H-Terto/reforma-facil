@@ -6,9 +6,9 @@ import {
   type KeyboardEvent,
 } from "react";
 import { Send01, X, RefreshCcw01, MessageCircle01 } from "@untitledui/icons";
-import { Link } from "react-router-dom";
+import { MarkdownMessage } from "./MarkdownMessage";
+import { buildChatHistory, type ChatLine } from "./chatHistory";
 
-type ChatLine = { role: "user" | "assistant"; content: string };
 type Mood = "idle" | "thinking" | "speaking" | "helpful" | "error";
 
 const avatar: Record<Mood, string> = {
@@ -26,86 +26,11 @@ const labels: Record<Mood, string> = {
   error: "Reforminha aguardando nova tentativa",
 };
 
-const officialHosts = [
-  "gov.br",
-  "planalto.gov.br",
-  "camara.leg.br",
-  "senado.leg.br",
-  "tcu.gov.br",
-];
-
-function LinkedAnswer({
-  content,
-  onInternalNavigate,
-}: {
-  content: string;
-  onInternalNavigate: () => void;
-}) {
-  // Deliberately allow only known internal routes from find_simulator.
-  // No arbitrary HTML, javascript: links or external redirects are interpreted.
-  const internalRoute = /^\/simulador(?:\?modo=(?:comparar|presumido|real))?$/;
-  const markdownLink =
-    /^\[([^\]\n]{1,80})\]\((\/simulador(?:\?modo=(?:comparar|presumido|real))?)\)$/;
-  const fragments = content.split(
-    /(\[[^\]\n]{1,80}\]\(\/simulador(?:\?modo=(?:comparar|presumido|real))?\)|https:\/\/[^\s<>()]+|\/simulador(?:\?modo=(?:comparar|presumido|real))?)/g,
-  );
-  return (
-    <>
-      {fragments.map((fragment, index) => {
-        const named = fragment.match(markdownLink);
-        const route =
-          named?.[2] || (internalRoute.test(fragment) ? fragment : undefined);
-        if (route) {
-          return (
-            <Link
-              key={index}
-              to={route}
-              onClick={onInternalNavigate}
-              className="font-semibold underline decoration-dotted underline-offset-2 hover:decoration-solid"
-            >
-              {named?.[1] || route}
-            </Link>
-          );
-        }
-        if (!fragment.startsWith("https://")) return fragment;
-        const link = fragment.replace(/[.,;:!?]+$/, "");
-        const trailing = fragment.slice(link.length);
-        try {
-          const url = new URL(link);
-          const host = url.hostname.toLowerCase();
-          if (
-            officialHosts.some(
-              (domain) => host === domain || host.endsWith("." + domain),
-            )
-          ) {
-            return (
-              <span key={index}>
-                <a
-                  href={link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="break-all font-semibold underline decoration-dotted underline-offset-2 hover:decoration-solid"
-                >
-                  {link}
-                  <span className="sr-only"> (abre nova aba)</span>
-                </a>
-                {trailing}
-              </span>
-            );
-          }
-        } catch {
-          /* invalid URL */
-        }
-        return fragment;
-      })}
-    </>
-  );
-}
-
 export function ReforminhaChat() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatLine[]>([]);
   const [draft, setDraft] = useState("");
+  const [preview, setPreview] = useState(false);
   const [phase, setPhase] = useState<Mood>("idle");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -147,9 +72,11 @@ export function ReforminhaChat() {
     const content = draft.trim();
     if (!content || busy) return;
 
+    const history = buildChatHistory(messages, content);
     const next: ChatLine[] = [...messages, { role: "user", content }];
     setMessages(next);
     setDraft("");
+    setPreview(false);
     setBusy(true);
     setError("");
     setPhase("thinking");
@@ -161,7 +88,7 @@ export function ReforminhaChat() {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: next.slice(-10) }),
+        body: JSON.stringify({ messages: history }),
         signal: controller.signal,
       });
       if (
@@ -198,7 +125,12 @@ export function ReforminhaChat() {
           : "Falha na consulta. Tente novamente.",
       );
       setPhase("error");
-      // Keep the failed user message visible; it is not a successful AI response.
+      // Mostra a falha ao usuário, mas não a reenvia no próximo turno.
+      setMessages((current) =>
+        current.map((line, index) =>
+          index === next.length - 1 ? { ...line, failed: true } : line,
+        ),
+      );
     } finally {
       setBusy(false);
       requestRef.current = undefined;
@@ -300,23 +232,24 @@ export function ReforminhaChat() {
                     className="size-9 shrink-0 object-contain"
                   />
                 )}
-                <p
+                <div
                   className={
-                    "max-w-[86%] whitespace-pre-wrap break-words rounded-xl px-3 py-2.5 text-sm leading-relaxed " +
+                    "min-w-0 max-w-[86%] rounded-xl px-3 py-2.5 " +
                     (line.role === "user"
                       ? "rounded-br-sm bg-brand text-white"
                       : "rounded-tl-sm bg-soft text-brand")
                   }
                 >
-                  {line.role === "assistant" ? (
-                    <LinkedAnswer
-                      content={line.content}
-                      onInternalNavigate={close}
-                    />
-                  ) : (
-                    line.content
+                  <MarkdownMessage
+                    content={line.content}
+                    onInternalNavigate={close}
+                  />
+                  {line.failed && (
+                    <p className="mt-1 text-xs opacity-80">
+                      Não enviada ao assistente.
+                    </p>
                   )}
-                </p>
+                </div>
               </div>
             ))}
             {busy && (
@@ -351,6 +284,15 @@ export function ReforminhaChat() {
             onSubmit={(event) => void send(event)}
             className="shrink-0 border-t border-line bg-surface p-3"
           >
+            {preview && draft.trim() && (
+              <div
+                role="region"
+                aria-label="Prévia Markdown"
+                className="mb-3 max-h-32 overflow-y-auto rounded-xl border border-line bg-soft px-3 py-2 text-brand"
+              >
+                <MarkdownMessage content={draft} />
+              </div>
+            )}
             <div className="flex items-end gap-2">
               <label className="min-w-0 flex-1">
                 <span className="sr-only">Mensagem para o Reforminha</span>
@@ -377,21 +319,34 @@ export function ReforminhaChat() {
             </div>
             <div className="mt-1 flex items-center justify-between gap-2">
               <p className="text-[11px] text-muted">
-                Enter envia · Shift+Enter quebra linha
+                Enter envia · Shift+Enter quebra linha · Markdown disponível
               </p>
-              <button
-                type="button"
-                disabled={busy || messages.length === 0}
-                onClick={() => {
-                  setMessages([]);
-                  setError("");
-                  setPhase("idle");
-                }}
-                className="inline-flex min-h-8 items-center gap-1 text-xs font-medium text-accent hover:underline disabled:opacity-50"
-              >
-                <RefreshCcw01 className="size-3.5" aria-hidden="true" /> Nova
-                conversa
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={!draft.trim() || busy}
+                  aria-pressed={preview}
+                  onClick={() => setPreview((value) => !value)}
+                  className="min-h-8 text-xs font-medium text-accent hover:underline disabled:opacity-50"
+                >
+                  Prévia Markdown
+                </button>
+                <button
+                  type="button"
+                  disabled={busy || messages.length === 0}
+                  onClick={() => {
+                    setMessages([]);
+                    setDraft("");
+                    setPreview(false);
+                    setError("");
+                    setPhase("idle");
+                  }}
+                  className="inline-flex min-h-8 items-center gap-1 text-xs font-medium text-accent hover:underline disabled:opacity-50"
+                >
+                  <RefreshCcw01 className="size-3.5" aria-hidden="true" />
+                  Nova conversa
+                </button>
+              </div>
             </div>
           </form>
         </section>
