@@ -1,8 +1,11 @@
 # Reforma Clara
+
 Portal educacional sobre a Reforma Tributária do Consumo, desenvolvido para o Grupo 1 de Princípios de Administração II.
 
 ## Executar
+
 Requer Node.js 22.12+ e npm.
+
 ```sh
 npm ci
 npm run dev
@@ -12,9 +15,11 @@ npm run test:api
 npm run typecheck:api
 npm run test:e2e
 ```
+
 Os testes E2E utilizam Google Chrome instalado (desktop e emulação móvel). O servidor de teste usa a porta 4175. O build estático fica em dist/; o `vercel.json` preserva a rota `/api/*` e configura o fallback das páginas SPA. O endpoint do chatbot é uma função serverless, não um servidor em execução contínua. Não há login, armazenamento de conversas em servidor nem publicação automática.
 
 ## Organização
+
 - src/components: layout, navegação, componentes visuais e FAQ (React Aria).
 - src/pages: início, guia, empresas, MEI, notícias, biblioteca, simuladores, calculadoras e página 404.
 - src/data/content.ts: conteúdo, links oficiais, cronograma e revisão editorial.
@@ -30,12 +35,15 @@ Os testes E2E utilizam Google Chrome instalado (desktop e emulação móvel). O 
 - docs/brainstorm.md: requisitos, personas, pesquisa e critérios de aceitação.
 
 ## Manutenção editorial
+
 Revisar fontes oficiais, datas, prazos e legislação antes de publicar. Atualizar o conteúdo e a data de revisão em src/data/content.ts. Os simuladores são educativos e não constituem apuração fiscal: exigem dados de receita e enquadramento, distinguem taxas de transição e referências técnicas de hipóteses, e não cobrem todos os regimes especiais. O chatbot integra LangChain.js com DeepSeek e ferramentas de simulação, pesquisa e orientação por regime; só faz chamadas reais quando a chave do servidor está configurada. Sem elas, informa indisponibilidade; não há respostas simuladas. Nenhum modelo substitui apuração fiscal ou validação normativa. Não há atualização automática do conteúdo editorial. Nunca coloque chaves no navegador.
 
 ## Identidade
+
 Poppins, azul petróleo, verde, fundo neutro. React + TypeScript + Vite + Tailwind CSS, React Router, React Aria, Untitled UI Icons e Oxlint, seguindo a referência Nordion.
 
 ## Iteração 02
+
 Consulte [docs/iteracao-02.md](docs/iteracao-02.md) para fontes legislativas, créditos de imagens, metodologia do simulador e matriz de responsividade.
 
 ## Chatbot Reforminha (LangChain + Vercel Functions)
@@ -65,6 +73,22 @@ A função `api/chat.ts` delega ao agente LangChain `createAgent` em `server/age
 - Não foram executados testes com credenciais reais de IA ou de pesquisa. O pipeline local foi validado com mocks e configuração ausente.
 
 Para arquitetura de Vercel Functions, consulte a [documentação da Vercel](https://vercel.com/docs/functions/runtimes/node-js).
+
+### Conversa Markdown e continuidade
+
+O Reforminha interpreta Markdown/GFM nas mensagens: parágrafos, listas,
+tabelas, títulos, código e links. O campo de digitação aceita a sintaxe
+Markdown e oferece o botão **Prévia Markdown**. HTML fornecido pelo modelo
+não é renderizado, imagens externas não são carregadas e links clicáveis
+ficam restritos às rotas internas e às fontes oficiais permitidas.
+
+As últimas mensagens concluídas são enviadas como contexto do agente,
+com limite de quantidade e tamanho do payload. Mensagens que falharam no
+envio não são reenviadas; o botão **Nova conversa** reinicia o contexto.
+As instruções evitam repetir apresentações e explicações antigas; um
+pós-processamento remove saudações iniciais em turnos subsequentes e
+parágrafos idênticos aos já respondidos, salvo solicitação para repetir.
+O histórico fica em memória enquanto a página está aberta, não em banco.
 
 ### Ferramentas independentes e documentação
 
