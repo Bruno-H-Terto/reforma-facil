@@ -1,96 +1,38 @@
 import { useEffect } from "react";
-import { NavLink, Link, Outlet, useLocation } from "react-router-dom";
-import { BookOpen01 } from "@untitledui/icons";
-import { reviewed } from "../data/content";
-const links = [
-  ["/", "Início"],
-  ["/entenda", "Entenda a reforma"],
-  ["/simulador", "Simulador"],
-  ["/biblioteca", "Biblioteca"],
-  ["/duvidas", "Dúvidas"],
-];
+import { Outlet, useLocation } from "react-router-dom";
+import { Header } from "./layout/Header";
+import { Footer } from "./layout/Footer";
+import { ReforminhaChat } from "./chat/ReforminhaChat";
 export function Layout() {
   const { pathname, hash } = useLocation();
   useEffect(() => {
-    if (hash) {
-      document.getElementById(hash.slice(1))?.scrollIntoView();
-    } else {
-      window.scrollTo(0, 0);
-    }
+    if (hash)
+      requestAnimationFrame(() =>
+        document.getElementById(hash.slice(1))?.scrollIntoView(),
+      );
+    else window.scrollTo(0, 0);
   }, [pathname, hash]);
   return (
     <>
       <a
         href="#conteudo"
-        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:p-3"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:text-brand focus:p-3"
       >
         Ir ao conteúdo
       </a>
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-4 lg:px-8">
-          <Link to="/" className="flex items-center gap-3">
-            <span className="grid size-10 place-items-center rounded-xl bg-brand text-white">
-              <BookOpen01 className="size-6" aria-hidden="true" />
-            </span>
-            <span className="text-lg font-bold tracking-tight text-brand">
-              Reforma<span className="text-accent"> Clara</span>
-              <span className="block text-[10px] font-medium tracking-normal text-slate-600">
-                Guia tributário independente
-              </span>
-            </span>
-          </Link>
-          <nav
-            aria-label="Navegação principal"
-            className="flex w-full flex-wrap gap-x-4 gap-y-2 text-sm lg:w-auto lg:gap-6"
-          >
-            {links.map(([to, label]) => (
-              <NavLink
-                key={to}
-                to={to}
-                end
-                className={({ isActive }) =>
-                  "py-2 font-medium border-b-2 transition-colors active:bg-emerald-100 " +
-                  (isActive
-                    ? "border-accent text-accent font-semibold"
-                    : "border-transparent text-slate-600 hover:text-brand")
-                }
-              >
-                {label}
-              </NavLink>
-            ))}
-          </nav>
-        </div>
-      </header>
+      <Header />
       <main
         id="conteudo"
-        className="mx-auto min-h-[70vh] max-w-7xl px-5 py-8 lg:px-8 lg:py-12"
+        className={
+          pathname === "/"
+            ? "min-h-[70vh]"
+            : "mx-auto min-w-0 min-h-[70vh] max-w-7xl px-5 py-7 lg:px-8 lg:py-10"
+        }
       >
         <Outlet />
       </main>
-      <footer className="border-t border-slate-200 bg-white">
-        <div className="mx-auto max-w-7xl px-5 py-8 text-sm text-slate-600 lg:px-8">
-          <p className="font-semibold text-brand">Reforma Clara · Grupo 1</p>
-          <p className="mt-2">
-            Protótipo acadêmico independente. Conteúdo educativo, não substitui
-            orientação contábil ou jurídica.
-          </p>
-          <p className="mt-1">
-            Revisão editorial: {reviewed}. Sem atualização automática.
-          </p>
-          <p className="mt-3 text-xs">
-            Ilustrações por{" "}
-            <a
-              href="https://storyset.com/"
-              target="_blank"
-              rel="noreferrer"
-              className="underline underline-offset-2 hover:text-brand"
-            >
-              Storyset / Freepik
-            </a>
-            .
-          </p>
-        </div>
-      </footer>
+      <Footer />
+      <ReforminhaChat />
     </>
   );
 }

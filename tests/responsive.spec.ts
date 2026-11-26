@@ -13,8 +13,17 @@ test("recortes adicionais: 320, 600, 768, 1024, 1440", async ({
       "/",
       "/entenda",
       "/simulador",
+      "/simulador/avancado",
       "/biblioteca",
       "/duvidas",
+      "/empresas",
+      "/empresas/regimes/lucro-presumido",
+      "/estados",
+      "/noticias",
+      "/mei",
+      "/calculadoras/simples",
+      "/calculadoras/presumido",
+      "/calculadoras/real",
     ]) {
       await page.goto(route);
       await page.evaluate(() => document.fonts.ready);
