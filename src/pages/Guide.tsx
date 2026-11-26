@@ -1,118 +1,78 @@
-import {
-  Action,
-  card,
-  PageIntro,
-  SectionTitle,
-  Source,
-} from "../components/ui";
-import { sources, timeline } from "../data/content";
-const changes = [
-  ["PIS e Cofins", "CBS", "Federal"],
-  ["ICMS e ISS", "IBS", "Estadual e municipal"],
-  ["IPI", "Redução a zero na maioria dos casos a partir de 2027", "Federal"],
-  ["—", "Imposto Seletivo (novo)", "Federal"],
-];
+import { TaxComparison } from "../components/guide/TaxComparison";
+import { TransitionTimeline } from "../components/guide/TransitionTimeline";
+import { Navigate, useLocation } from "react-router-dom";
+import { GlossaryText } from "../components/guide/GlossaryText";
+import { TaxBasics } from "../components/TaxBasics";
+import { Action, card, PageIntro, SectionTitle } from "../components/ui";
 export function Guide() {
+  const { hash } = useLocation();
+  if (hash === "#glossario") return <Navigate to="/entenda#tributos" replace />;
+  if (hash === "#duvidas") return <Navigate to="/#duvidas" replace />;
   return (
     <div className="space-y-10">
-      <PageIntro label="Guia essencial" title="O que muda na prática?">
-        A reforma reorganiza os tributos sobre bens e serviços. A mudança
-        acontece por etapas; não é uma troca de todos os impostos de uma só vez.
-      </PageIntro>
-      <section>
-        <SectionTitle title="Conheça o novo modelo" />
-        <div className="grid gap-4 md:grid-cols-3">
-          {[
-            ["CBS", "Contribuição federal que substitui PIS e Cofins."],
-            [
-              "IBS",
-              "Imposto de estados e municípios que substitui ICMS e ISS.",
-            ],
-            [
-              "IS",
-              "Imposto Seletivo sobre bens e serviços definidos na legislação.",
-            ],
-          ].map(([title, text]) => (
-            <article key={title} className={card}>
-              <h3 className="text-2xl font-semibold text-accent">{title}</h3>
-              <p className="mt-3 text-sm leading-relaxed">{text}</p>
-            </article>
-          ))}
-        </div>
-        <div className="mt-4">
-          <Source url={sources.overview} />
-        </div>
-      </section>
-      <section>
-        <SectionTitle title="Antes e depois" />
-        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-brand text-white">
-              <tr>
-                {["Modelo anterior", "Novo modelo", "Competência"].map((t) => (
-                  <th key={t} scope="col" className="p-3">
-                    {t}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {changes.map((row) => (
-                <tr
-                  key={row[0]}
-                  className="border-b border-slate-200 last:border-0"
-                >
-                  {row.map((x, i) => (
-                    <td key={i} className="p-3 align-top">
-                      {x}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p className="mt-3 text-xs text-slate-600">
-          Quadro simplificado; exceções legais e regimes específicos não estão
-          representados.
-        </p>
-      </section>
-      <section id="cronograma">
-        <SectionTitle title="Cronograma de transição">
-          Do ano de teste à implantação integral do modelo geral.
-        </SectionTitle>
-        <ol className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {timeline.map((t) => (
-            <li key={t.year} className={card}>
-              <p className="text-lg font-semibold text-accent">{t.year}</p>
-              <h3 className="mt-2 font-semibold text-brand">{t.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                {t.text}
-              </p>
-            </li>
-          ))}
-        </ol>
-        <div className="mt-4">
-          <Source url={sources.timeline} />
-        </div>
-      </section>
+      <div>
+        <PageIntro label="Guia essencial" title="O que muda na prática?">
+          <GlossaryText
+            introduce={["IVA dual"]}
+            text="A reforma reorganiza os tributos sobre bens e serviços em um IVA dual. A mudança acontece por etapas."
+          />
+        </PageIntro>
+        <aside
+          aria-label="Como consultar os termos"
+          className="flex w-full items-center gap-3 rounded-xl bg-soft px-3 py-2 sm:gap-5 sm:px-5"
+        >
+          <img
+            src="/images/mascot/chat-thinking.webp"
+            alt="Reforminha pensativo"
+            width={150}
+            height={150}
+            className="h-auto w-16 shrink-0 object-contain sm:w-20"
+          />
+          <div className="min-w-0">
+            <p className="text-base font-semibold text-brand">
+              Encontrou um termo desconhecido?
+            </p>
+            <p className="mt-1 text-sm leading-relaxed text-muted">
+              Passe o mouse ou toque nas{" "}
+              <span className="underline decoration-dotted underline-offset-[0.2em]">
+                palavras sublinhadas
+              </span>{" "}
+              para consultar seu significado.
+            </p>
+          </div>
+        </aside>
+      </div>
+      <TaxBasics guide />
+      <TaxComparison />
+      <TransitionTimeline />
       <section className={card}>
         <SectionTitle title="O que fazer agora?" />
         <div className="grid gap-5 md:grid-cols-3">
           {[
             [
               "Empresários",
-              "Converse com seu contador, revise preços, clientes e fornecedores.",
+              "Converse com seu contador, revise preços, clientes, fornecedores e o DAS, quando aplicável.",
             ],
             [
               "Contadores",
-              "Revise documentos fiscais, regimes, créditos e sistemas com base na legislação.",
+              "Revise documentos fiscais, regimes, créditos tributários e sistemas com base na legislação.",
             ],
-            ["Estudantes", "Comece pelo comparativo, cronograma e glossário."],
+            ["Estudantes", "Comece pelo comparativo e cronograma."],
           ].map(([t, a]) => (
             <div key={t}>
               <h3 className="font-semibold text-brand">{t}</h3>
-              <p className="mt-2 text-sm">{a}</p>
+              <p className="mt-2 text-sm">
+                <GlossaryText
+                  text={a}
+                  introduce={
+                    t === "Empresários"
+                      ? ["DAS"]
+                      : t === "Contadores"
+                        ? ["Crédito tributário"]
+                        : []
+                  }
+                />
+              </p>
             </div>
           ))}
         </div>

@@ -1,4 +1,4 @@
-export const reviewed = "24/11/2026";
+export const reviewed = "26/11/2026";
 const rfb =
   "https://www.gov.br/receitafederal/pt-br/acesso-a-informacao/acoes-e-programas/reforma-tributaria-do-consumo";
 export const sources = {
@@ -18,27 +18,44 @@ export const sources = {
 };
 export const timeline = [
   {
+    year: "2024–2025",
+    title: "Regulamentação",
+    text: "Preparação das regras e dos sistemas de cobrança dos novos tributos.",
+    icon: "book",
+  },
+  {
     year: "2026",
     title: "Ano de teste",
+    icon: "beaker",
     text: "Fase inicial de IBS e CBS. A dispensa de recolhimento das alíquotas de teste depende do cumprimento das obrigações previstas na legislação.",
   },
   {
     year: "2027–2028",
     title: "Início da CBS",
+    icon: "banknote",
     text: "CBS substitui PIS e Cofins; início do Imposto Seletivo e redução do IPI a zero, ressalvadas as exceções legais.",
   },
   {
     year: "2029–2032",
     title: "Transição gradual",
+    icon: "arrow-left-right",
     text: "ICMS e ISS diminuem gradualmente enquanto o IBS ganha participação.",
   },
   {
     year: "2033",
     title: "Novo modelo em vigor",
+    icon: "award",
     text: "IBS substitui integralmente ICMS e ISS no cronograma geral.",
   },
 ];
 export const topics = [
+  {
+    title: "Resolução CGSN 196/2026 — novas regras do Simples",
+    category: "Atualizações",
+    date: "24/11/2026",
+    text: "Adequação da regulamentação do Simples ao IBS e CBS, com efeitos a partir de 2027 conforme transição.",
+    url: "https://www.gov.br/receitafederal/pt-br/assuntos/noticias/2026/novembro/comite-gestor-do-simples-nacional-publica-novas-regras-para-o-simples-nacional-e-para-a-transicao-da-reforma-tributaria",
+  },
   {
     title: "O que muda com a reforma?",
     category: "Entenda",
@@ -90,10 +107,29 @@ export const topics = [
   },
 ];
 export const glossary = [
-  ["CBS", "Contribuição sobre Bens e Serviços, de competência federal."],
+  [
+    "CBS",
+    "Contribuição sobre Bens e Serviços. Tributo federal sobre o consumo que substitui PIS e Cofins a partir de 2027.",
+  ],
   [
     "IBS",
-    "Imposto sobre Bens e Serviços, de competência compartilhada entre estados e municípios.",
+    "Imposto sobre Bens e Serviços. Tributo dos estados e municípios que substitui ICMS e ISS gradualmente até 2033.",
+  ],
+  [
+    "ICMS",
+    "Imposto estadual cobrado, por exemplo, na circulação de mercadorias. Será substituído gradualmente pelo IBS.",
+  ],
+  [
+    "ISS",
+    "Imposto municipal sobre serviços. Será substituído gradualmente pelo IBS.",
+  ],
+  [
+    "PIS e Cofins",
+    "Contribuições federais que incidem, em geral, sobre receitas. Serão substituídas pela CBS.",
+  ],
+  [
+    "IPI",
+    "Imposto federal sobre produtos industrializados. Terá alíquotas reduzidas a zero na maioria dos casos a partir de 2027.",
   ],
   ["IVA dual", "Modelo de imposto sobre valor agregado dividido em CBS e IBS."],
   [
@@ -106,7 +142,7 @@ export const glossary = [
   ],
   [
     "Imposto Seletivo",
-    "Tributo federal sobre bens e serviços prejudiciais à saúde ou ao meio ambiente, conforme legislação.",
+    "Tributo federal criado para desestimular o consumo de determinados produtos e serviços prejudiciais à saúde ou ao meio ambiente.",
   ],
 ];
 export const faqs = [
