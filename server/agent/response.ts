@@ -1,7 +1,7 @@
 import type { ChatHistory } from "./agent.ts";
 
 const greeting =
-  /^\s*(?:\*\*)?(?:olá|oi|bom dia|boa tarde|boa noite)(?=\s|[!.,:;]|$)[!.,:;\s]*(?:\*\*)?\s*/i;
+  /^\s*(?:#{1,3}\s+)?(?:\*\*)?(?:olá|oi|bom dia|boa tarde|boa noite)(?=\s|[!.,:;]|$)[!.,:;\s]*(?:\*\*)?\s*/i;
 const explicitRecall =
   /\b(repita|repetir|relembre|relembrar|recapitule|recapitular|resuma|resumir|cite novamente)\b/i;
 
@@ -17,10 +17,16 @@ export function refineFollowUp(answer: string, history: ChatHistory): string {
   if (previousAnswers.length === 0) return answer.trim();
 
   const question = history.at(-1)?.content ?? "";
-  if (explicitRecall.test(question)) return answer.trim();
+  // Mesmo quando a pergunta pede uma recapitulação, não repetir saudações.
+  const requestedGreeting =
+    /\b(cumprimente|cumprimentar|diga boa tarde|diga bom dia|diga boa noite)\b/i.test(
+      question,
+    );
+  if (requestedGreeting) return answer.trim();
 
   let updated = answer.trim().replace(greeting, "").trim();
   if (!updated) updated = answer.trim();
+  if (explicitRecall.test(question)) return updated;
 
   const paragraphs = updated.split(/\n\s*\n/);
   while (

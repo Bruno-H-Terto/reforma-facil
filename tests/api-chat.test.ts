@@ -436,7 +436,7 @@ test("primeiro turno e pedidos explícitos para repetir preservam a resposta", (
       "Boa tarde! O IBS é um imposto sobre bens e serviços.",
       transcript,
     ),
-    "Boa tarde! O IBS é um imposto sobre bens e serviços.",
+    "O IBS é um imposto sobre bens e serviços.",
   );
 });
 
