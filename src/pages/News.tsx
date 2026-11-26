@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { PageIntro, SectionTitle, Source, card, field } from "../components/ui";
 import { states } from "../data/business";
 import { news, newsReviewed, officialNews } from "../data/news";
@@ -39,6 +39,14 @@ export function News() {
       >
         Encontre notícias e orientações oficiais por tema ou região.
       </PageIntro>
+      <nav aria-label="Fontes de consulta" className="flex flex-wrap gap-3">
+        <Link
+          to="/biblioteca"
+          className="inline-flex min-h-11 items-center rounded-lg border border-line-strong bg-surface px-4 py-2 font-semibold text-brand hover:bg-soft"
+        >
+          Legislação e guias
+        </Link>
+      </nav>
       <section className={card}>
         <SectionTitle title="Filtrar notícias">
           Acervo editorial de janeiro de 2025 a novembro de 2026. Revisão em{" "}
