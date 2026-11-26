@@ -18,9 +18,21 @@ export function FieldInfo({ label, text }: { label: string; text: string }) {
     const width = tooltip.offsetWidth;
     const height = tooltip.offsetHeight;
     tooltip.style.left =
-      Math.max(8, Math.min(rect.left + rect.width / 2 - width / 2, innerWidth - width - 8)) + "px";
+      Math.max(
+        8,
+        Math.min(
+          rect.left + rect.width / 2 - width / 2,
+          innerWidth - width - 8,
+        ),
+      ) + "px";
     tooltip.style.top =
-      Math.max(8, Math.min(rect.top >= height + 16 ? rect.top - height - 8 : rect.bottom + 8, innerHeight - height - 8)) + "px";
+      Math.max(
+        8,
+        Math.min(
+          rect.top >= height + 16 ? rect.top - height - 8 : rect.bottom + 8,
+          innerHeight - height - 8,
+        ),
+      ) + "px";
   };
   const show = () => {
     cancel();
