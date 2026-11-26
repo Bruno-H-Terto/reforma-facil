@@ -4,6 +4,7 @@ import { AIMessage, ToolMessage } from "@langchain/core/messages";
 import { fakeModel } from "@langchain/core/testing";
 import { handleRequest } from "../api/chat.ts";
 import { createDeepSeekModel } from "../server/agent/model.ts";
+import { refineFollowUp } from "../server/agent/response.ts";
 import { agentTools, createReforminhaAgent } from "../server/agent/agent.ts";
 import { simulateTaxes } from "../server/tools/simulateTaxes.ts";
 import { searchOfficialSources } from "../server/tools/searchOfficialSources.ts";
@@ -364,4 +365,105 @@ test("createAgent: seleciona e executa a tool específica de Lucro Presumido", a
   );
   assert.equal(model.callCount, 2);
   assert.match(String(result.messages.at(-1)?.content), /IRPJ e CSLL/);
+});
+
+test("HTTP: aceita contexto de respostas Markdown maiores que a pergunta", async () => {
+  const history = [
+    { role: "user", content: "O que muda no Simples?" },
+    { role: "assistant", content: "# Simples Nacional\\n" + "A".repeat(2200) },
+    { role: "user", content: "E quanto ao MEI?" },
+  ];
+  const before = process.env.DEEPSEEK_API_KEY;
+  delete process.env.DEEPSEEK_API_KEY;
+  try {
+    // 503 confirma validação aceita; 400 seria rejeição incorreta do histórico.
+    const result = await handleRequest(makeRequest({ messages: history }));
+    assert.equal(result.status, 503);
+
+    const invalid = await handleRequest(
+      makeRequest({
+        messages: [
+          { role: "assistant", content: "x".repeat(6001) },
+          { role: "user", content: "e depois?" },
+        ],
+      }),
+    );
+    assert.equal(invalid.status, 400);
+  } finally {
+    if (before) process.env.DEEPSEEK_API_KEY = before;
+  }
+});
+
+test("resposta em sequência omite cumprimentos e parágrafos já apresentados", () => {
+  const paragraph =
+    "A reforma do consumo modifica a forma de apuração do IBS e da CBS, dependendo do regime tributário e da fase da transição.";
+  const earlier = [
+    { role: "user" as const, content: "O que é a reforma?" },
+    { role: "assistant" as const, content: "Boa tarde!\n\n" + paragraph },
+    { role: "user" as const, content: "Qual o impacto para empresas?" },
+  ];
+  const answer = refineFollowUp(
+    "**Boa tarde!**\n\n" +
+      paragraph +
+      "\n\nO impacto depende das operações e do regime.",
+    earlier,
+  );
+  assert.equal(answer, "O impacto depende das operações e do regime.");
+  assert.equal(
+    refineFollowUp("Boa tarde! O IBS é um imposto.", earlier),
+    "O IBS é um imposto.",
+  );
+  assert.equal(refineFollowUp("Olá! Uma novidade.", earlier), "Uma novidade.");
+});
+
+test("primeiro turno e pedidos explícitos para repetir preservam a resposta", () => {
+  assert.equal(
+    refineFollowUp("Boa tarde! Como posso ajudar?", [
+      { role: "user", content: "Boa tarde!" },
+    ]),
+    "Boa tarde! Como posso ajudar?",
+  );
+  const transcript = [
+    { role: "user" as const, content: "Explique IBS" },
+    {
+      role: "assistant" as const,
+      content: "O IBS é um imposto sobre bens e serviços.",
+    },
+    { role: "user" as const, content: "Repita a explicação anterior." },
+  ];
+  assert.equal(
+    refineFollowUp(
+      "Boa tarde! O IBS é um imposto sobre bens e serviços.",
+      transcript,
+    ),
+    "Boa tarde! O IBS é um imposto sobre bens e serviços.",
+  );
+});
+
+test("agente recebe histórico anterior do usuário e da IA ao continuar o assunto", async () => {
+  const model = fakeModel().respond((messages) => {
+    const texts = messages.map((msg) => String(msg.content));
+    assert.ok(texts.includes("Tenho uma padaria e estou no Simples Nacional."));
+    assert.ok(
+      texts.includes("Vamos considerar o Simples Nacional da padaria."),
+    );
+    assert.ok(texts.includes("E em 2027?"));
+    return new AIMessage("Em 2027, é preciso observar a transição.");
+  });
+  const agent = createReforminhaAgent(model);
+  assert.ok(agent);
+  const result = await agent.invoke({
+    messages: [
+      {
+        role: "user",
+        content: "Tenho uma padaria e estou no Simples Nacional.",
+      },
+      {
+        role: "assistant",
+        content: "Vamos considerar o Simples Nacional da padaria.",
+      },
+      { role: "user", content: "E em 2027?" },
+    ],
+  });
+  assert.match(String(result.messages.at(-1)?.content), /2027/);
 });

@@ -9,10 +9,18 @@ const MAX_BYTES = 16_000;
 const requestSchema = z.object({
   messages: z
     .array(
-      z.object({
-        role: z.enum(["user", "assistant"]),
-        content: z.string().trim().min(1).max(1800),
-      }),
+      z.discriminatedUnion("role", [
+        z.object({
+          role: z.literal("user"),
+          content: z.string().trim().min(1).max(1800),
+        }),
+        z.object({
+          role: z.literal("assistant"),
+          // As respostas do modelo costumam ser maiores que as perguntas.
+          // Elas precisam ser aceitas ao reenviar o histórico no próximo turno.
+          content: z.string().trim().min(1).max(6000),
+        }),
+      ]),
     )
     .min(1)
     .max(10),

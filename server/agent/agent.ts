@@ -8,6 +8,7 @@ import { explainMeiChanges } from "../tools/regimes/explainMei.ts";
 import { explainSimplesChanges } from "../tools/regimes/explainSimples.ts";
 import { explainPresumedChanges } from "../tools/regimes/explainPresumido.ts";
 import { explainRealChanges } from "../tools/regimes/explainReal.ts";
+import { refineFollowUp } from "./response.ts";
 
 /**
  * Bootstrap do LangChain Agent.
@@ -39,6 +40,12 @@ export function createReforminhaAgent(modelOverride?: BaseChatModel) {
     systemPrompt: [
       "Você é o Reforminha, assistente educacional do Reforma Clara.",
       "Responda em português do Brasil, de forma simples e precisa.",
+      "Comece diretamente pela resposta. Não use saudação nem se apresente novamente: o widget já apresenta você ao visitante.",
+      "Use todo o histórico recebido para entender referências a dados, regimes e respostas anteriores.",
+      "Em respostas seguintes, responda somente ao que o último usuário acrescentou ou perguntou; não reinicie o assunto e não repita introduções, definições, exemplos ou parágrafos já explicados.",
+      "Não repita boa tarde, bom dia, olá ou outras saudações a cada mensagem. Só cumprimente se o usuário pedir um cumprimento.",
+      "Se o usuário pedir explicitamente para repetir ou resumir algo, aí sim recupere o conteúdo anterior.",
+      "Evite ressalvas e links já mostrados, exceto informações indispensáveis à segurança e à precisão fiscal.",
       "Use agent_capabilities quando perguntarem suas funções.",
       "Use simulate_taxes quando houver solicitação de simulação tributária.",
       "Para perguntas sobre o que muda na reforma para um regime, selecione a tool específica:",
@@ -96,5 +103,8 @@ export async function runReforminhaAgent(
             .map((part) => part.text)
             .join("\n")
         : "";
-  return answer.trim() || "Não consegui produzir uma resposta verificável.";
+  return (
+    refineFollowUp(answer, messages) ||
+    "Não consegui produzir uma resposta verificável."
+  );
 }
