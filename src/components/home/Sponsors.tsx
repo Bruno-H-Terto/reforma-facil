@@ -48,6 +48,8 @@ export function Sponsors() {
       </p>
       <div
         className="sponsors-marquee mt-4 overflow-hidden"
+        role="region"
+        tabIndex={0}
         aria-label="Logotipos ilustrativos"
       >
         <div className="sponsors-marquee-track flex w-max items-center">
