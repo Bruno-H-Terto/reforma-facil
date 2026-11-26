@@ -94,6 +94,24 @@ export function QuickSimulator() {
           className="mx-auto hidden w-full max-w-[320px] md:block"
         />
       </div>
+      <aside
+        aria-label="Limitação regional da simulação"
+        className="rounded-xl border border-line bg-soft px-4 py-3 text-sm leading-relaxed text-brand"
+      >
+        <strong>Sobre estados e municípios:</strong> este simulador não calcula
+        diferenças de ICMS/ISS conforme a localidade nem aplica alíquotas
+        estaduais e municipais futuras específicas do IBS. Para 2027 e 2028, a
+        alíquota-padrão do IBS na transição é igual em todas as UFs, quando
+        aplicável; selecionar outro estado, por si só, não altera o DAS
+        estimado. A partir de 2029, a tributação poderá depender de alíquotas
+        regionais e regras específicas que ainda não integram estes cálculos.{" "}
+        <Link
+          to="/estados"
+          className="font-semibold text-accent underline underline-offset-2 hover:decoration-2"
+        >
+          Entenda o impacto regional.
+        </Link>
+      </aside>
       <RegimeTabs
         items={simulatorTabs}
         selected={active === "comparar" ? "das" : active}

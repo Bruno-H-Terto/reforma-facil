@@ -60,3 +60,24 @@ test("Minha empresa mantém link para comparação integrado ao Simples", async 
     page.getByRole("heading", { name: /DAS ou IBS\/CBS por fora/ }),
   ).toBeVisible();
 });
+
+test("aviso regional é visível nos três regimes e não atribui alíquotas por estado", async ({
+  page,
+}) => {
+  await page.goto("/simulador");
+  const notice = page.getByRole("complementary", {
+    name: "Limitação regional da simulação",
+  });
+  await expect(notice).toBeVisible();
+  await expect(notice).toContainText("2027 e 2028");
+  await expect(notice).toContainText("2029");
+  await expect(notice).toContainText("ICMS/ISS");
+  await expect(
+    notice.getByRole("link", { name: "Entenda o impacto regional." }),
+  ).toHaveAttribute("href", "/estados");
+
+  for (const regime of ["Lucro Presumido", "Lucro Real", "Simples Nacional"]) {
+    await page.getByRole("tab", { name: regime }).click();
+    await expect(notice).toBeVisible();
+  }
+});

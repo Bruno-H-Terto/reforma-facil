@@ -467,3 +467,33 @@ test("agente recebe histórico anterior do usuário e da IA ao continuar o assun
   });
   assert.match(String(result.messages.at(-1)?.content), /2027/);
 });
+
+test("agente: prompt não autoriza cálculos regionais com alíquotas não definidas", async () => {
+  const model = fakeModel().respond((messages) => {
+    const system = messages
+      .filter((message) => message._getType() === "system")
+      .map((message) => JSON.stringify(message.content))
+      .join("\n");
+    assert.match(system, /\/simulador/);
+    assert.match(system, /\/estados/);
+    assert.match(system, /2027 e 2028/);
+    assert.match(system, /2029/);
+    assert.match(system, /Não invente, estime nem substitua/);
+    assert.match(system, /NÃO é calculada pela tool simulate_taxes/);
+    assert.doesNotMatch(
+      system,
+      /realize a simulação com os dados obtidos da busca oficial/,
+    );
+    return new AIMessage(
+      "O cálculo por UF ainda não está disponível; use /simulador para a estimativa nacional.",
+    );
+  });
+  const agent = createReforminhaAgent(model);
+  assert.ok(agent);
+  const result = await agent.invoke({
+    messages: [
+      { role: "user", content: "Compare o DAS de uma empresa em MG e SP." },
+    ],
+  });
+  assert.match(String(result.messages.at(-1)?.content), /\/simulador/);
+});
