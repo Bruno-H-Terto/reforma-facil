@@ -99,3 +99,44 @@
     overflow-x: auto;
   }
 }
+
+/* Editor Markdown WYSIWYG do chat: estilo restrito ao campo de digitação. */
+.chat-md-composer .tiptap p {
+  margin: 0;
+}
+.chat-md-composer .tiptap p + p {
+  margin-top: 0.35rem;
+}
+.chat-md-composer .tiptap h2 {
+  margin-block: 0.35rem;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+.chat-md-composer .tiptap ul,
+.chat-md-composer .tiptap ol {
+  padding-left: 1.3rem;
+  margin-block: 0.35rem;
+}
+.chat-md-composer .tiptap ul {
+  list-style: disc;
+}
+.chat-md-composer .tiptap ol {
+  list-style: decimal;
+}
+.chat-md-composer .tiptap code {
+  font-family: monospace;
+  border-radius: 0.2rem;
+  padding-inline: 0.15rem;
+  background: var(--color-soft);
+}
+.chat-md-composer .tiptap blockquote {
+  border-left: 3px solid var(--color-gold);
+  padding-left: 0.6rem;
+}
+.chat-md-composer .tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--color-muted);
+  pointer-events: none;
+  float: left;
+  height: 0;
+}

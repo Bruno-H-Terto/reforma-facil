@@ -88,26 +88,71 @@ test("chat exibe Markdown GFM e só transforma URLs confiáveis em links", async
   ).toHaveCount(0);
 });
 
-test("textarea aceita sintaxe Markdown e mostra prévia formatada", async ({
+test("formatação ocorre no próprio editor ao digitar atalhos Markdown", async ({
   page,
 }) => {
   const { dialog, textbox } = await openChat(page);
-  const tick = String.fromCharCode(96);
-  await textbox.fill(
-    "**Importante**\n\n- Um\n- Dois\n\n" + tick + "DAS" + tick,
-  );
-  const button = dialog.getByRole("button", { name: "Prévia Markdown" });
-  await expect(button).toHaveAttribute("aria-pressed", "false");
-  await button.click();
-  await expect(button).toHaveAttribute("aria-pressed", "true");
+  await expect(textbox).toHaveAttribute("contenteditable", "true");
 
-  const preview = dialog.getByRole("region", { name: "Prévia Markdown" });
-  await expect(preview.locator("strong")).toHaveText("Importante");
-  await expect(preview.getByRole("listitem")).toHaveCount(2);
-  await expect(preview.locator("code")).toHaveText("DAS");
+  await textbox.pressSequentially("**Importante**", { delay: 8 });
+  await expect(textbox.locator("strong")).toHaveText("Importante");
+  await expect(
+    dialog.getByRole("region", { name: "Prévia Markdown" }),
+  ).toHaveCount(0);
 
-  await button.click();
-  await expect(preview).toHaveCount(0);
+  await textbox.fill("");
+  await textbox.pressSequentially("- Primeiro item", { delay: 8 });
+  await expect(textbox.locator("li")).toHaveText("Primeiro item");
+
+  await textbox.fill("");
+  await textbox.pressSequentially("## Orientação", { delay: 8 });
+  await expect(textbox.locator("h2")).toHaveText("Orientação");
+});
+
+test("botões de formatação atuam dentro do campo e o envio usa Markdown", async ({
+  page,
+}) => {
+  let received = "";
+  await page.route("**/api/chat", (route) => {
+    received = route.request().postDataJSON().messages[0].content;
+    return route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ answer: "Recebido." }),
+    });
+  });
+
+  const { dialog, textbox } = await openChat(page);
+  await textbox.fill("Mensagem importante");
+  await textbox.selectText();
+  await dialog.getByRole("button", { name: "Negrito" }).click();
+  await expect(textbox.locator("strong")).toHaveText("Mensagem importante");
+
+  await textbox.press("End");
+  await textbox.press("Enter");
+  await expect(dialog.getByText("Recebido.")).toBeVisible();
+  expect(received).toBe("**Mensagem importante**");
+});
+
+test("Shift+Enter insere quebra de linha sem enviar", async ({ page }) => {
+  let received = "";
+  await page.route("**/api/chat", (route) => {
+    received = route.request().postDataJSON().messages[0].content;
+    return route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ answer: "Recebido." }),
+    });
+  });
+  const { dialog, textbox } = await openChat(page);
+  await textbox.fill("Primeira linha");
+  await textbox.press("Shift+Enter");
+  await textbox.pressSequentially("Segunda linha");
+  await expect(textbox).toContainText("Segunda linha");
+  expect(received).toBe("");
+  await dialog.getByRole("button", { name: "Enviar mensagem" }).click();
+  await expect(dialog.getByText("Recebido.")).toBeVisible();
+  expect(received).toMatch(/Primeira linha[\s\S]*Segunda linha/);
 });
 
 test("continuação envia respostas anteriores como contexto e não altera Markdown", async ({
@@ -182,4 +227,39 @@ test("mensagem que falhou não é reenviada nas próximas perguntas", async ({
   expect(requests[1].messages).toEqual([
     { role: "user", content: "Segunda pergunta" },
   ]);
+});
+
+test("rascunho formatado permanece ao recolher e reabrir o chat", async ({
+  page,
+}) => {
+  let received = "";
+  await page.route("**/api/chat", (route) => {
+    received = route.request().postDataJSON().messages[0].content;
+    return route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ answer: "Recebido." }),
+    });
+  });
+
+  const { dialog, textbox } = await openChat(page);
+  await textbox.pressSequentially("**Rascunho**", { delay: 8 });
+  await expect(textbox.locator("strong")).toHaveText("Rascunho");
+
+  await dialog.getByRole("button", { name: "Fechar conversa" }).click();
+  await expect(dialog).toBeHidden();
+  await page
+    .getByRole("button", { name: "Conversar com o Reforminha" })
+    .click();
+
+  const reopened = page.getByRole("dialog", {
+    name: "Conversa com o Reforminha",
+  });
+  const editor = reopened.getByRole("textbox", {
+    name: "Mensagem para o Reforminha",
+  });
+  await expect(editor.locator("strong")).toHaveText("Rascunho");
+  await reopened.getByRole("button", { name: "Enviar mensagem" }).click();
+  await expect(reopened.getByText("Recebido.")).toBeVisible();
+  expect(received).toBe("**Rascunho**");
 });

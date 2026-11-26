@@ -1,13 +1,21 @@
 import {
+  lazy,
+  Suspense,
   useEffect,
   useRef,
   useState,
   type FormEvent,
-  type KeyboardEvent,
 } from "react";
 import { Send01, X, RefreshCcw01, MessageCircle01 } from "@untitledui/icons";
 import { MarkdownMessage } from "./MarkdownMessage";
 import { buildChatHistory, type ChatLine } from "./chatHistory";
+import type { MarkdownComposerHandle } from "./MarkdownComposer";
+
+const MarkdownComposer = lazy(() =>
+  import("./MarkdownComposer").then((module) => ({
+    default: module.MarkdownComposer,
+  })),
+);
 
 type Mood = "idle" | "thinking" | "speaking" | "helpful" | "error";
 
@@ -30,12 +38,12 @@ export function ReforminhaChat() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatLine[]>([]);
   const [draft, setDraft] = useState("");
-  const [preview, setPreview] = useState(false);
   const [phase, setPhase] = useState<Mood>("idle");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const composerRef = useRef<MarkdownComposerHandle>(null);
   const launchRef = useRef<HTMLButtonElement>(null);
   const resetTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
@@ -44,7 +52,6 @@ export function ReforminhaChat() {
 
   useEffect(() => {
     if (open) {
-      inputRef.current?.focus();
       bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
     }
   }, [open]);
@@ -69,14 +76,14 @@ export function ReforminhaChat() {
 
   const send = async (event?: FormEvent) => {
     event?.preventDefault();
-    const content = draft.trim();
-    if (!content || busy) return;
+    const content = (composerRef.current?.getMarkdown() ?? draft).trim();
+    if (!content || content.length > 1800 || busy) return;
 
     const history = buildChatHistory(messages, content);
     const next: ChatLine[] = [...messages, { role: "user", content }];
     setMessages(next);
+    composerRef.current?.clear();
     setDraft("");
-    setPreview(false);
     setBusy(true);
     setError("");
     setPhase("thinking");
@@ -134,17 +141,6 @@ export function ReforminhaChat() {
     } finally {
       setBusy(false);
       requestRef.current = undefined;
-    }
-  };
-
-  const keyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (
-      event.key === "Enter" &&
-      !event.shiftKey &&
-      !event.nativeEvent.isComposing
-    ) {
-      event.preventDefault();
-      void send();
     }
   };
 
@@ -281,36 +277,32 @@ export function ReforminhaChat() {
             <div ref={bottomRef} />
           </div>
           <form
+            ref={formRef}
             onSubmit={(event) => void send(event)}
             className="shrink-0 border-t border-line bg-surface p-3"
           >
-            {preview && draft.trim() && (
-              <div
-                role="region"
-                aria-label="Prévia Markdown"
-                className="mb-3 max-h-32 overflow-y-auto rounded-xl border border-line bg-soft px-3 py-2 text-brand"
-              >
-                <MarkdownMessage content={draft} />
-              </div>
-            )}
             <div className="flex items-end gap-2">
-              <label className="min-w-0 flex-1">
-                <span className="sr-only">Mensagem para o Reforminha</span>
-                <textarea
-                  ref={inputRef}
-                  rows={2}
-                  maxLength={1800}
-                  value={draft}
-                  onChange={(event) => setDraft(event.target.value)}
-                  onKeyDown={keyDown}
-                  placeholder="Pergunte sobre a reforma..."
+              <Suspense
+                fallback={
+                  <p
+                    role="status"
+                    className="flex min-h-12 min-w-0 flex-1 items-center rounded-xl border border-line px-3 text-sm text-muted"
+                  >
+                    Preparando editor...
+                  </p>
+                }
+              >
+                <MarkdownComposer
+                  ref={composerRef}
+                  initialMarkdown={draft}
                   disabled={busy}
-                  className="block max-h-28 min-h-12 w-full resize-y rounded-xl border border-line-strong bg-white px-3 py-2 text-base text-ink focus:outline-2 focus:outline-accent"
+                  onChange={setDraft}
+                  onSend={() => formRef.current?.requestSubmit()}
                 />
-              </label>
+              </Suspense>
               <button
                 type="submit"
-                disabled={!draft.trim() || busy}
+                disabled={!draft.trim() || draft.length > 1800 || busy}
                 className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-brand text-white hover:bg-brand-mid disabled:opacity-50"
                 aria-label="Enviar mensagem"
               >
@@ -318,35 +310,28 @@ export function ReforminhaChat() {
               </button>
             </div>
             <div className="mt-1 flex items-center justify-between gap-2">
-              <p className="text-[11px] text-muted">
-                Enter envia · Shift+Enter quebra linha · Markdown disponível
+              <p id="reforminha-editor-help" className="text-[11px] text-muted">
+                Formatação ao digitar · Enter envia · Shift+Enter quebra linha
+                {draft.length > 1800 && (
+                  <span role="alert"> · Máximo de 1.800 caracteres</span>
+                )}
               </p>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  disabled={!draft.trim() || busy}
-                  aria-pressed={preview}
-                  onClick={() => setPreview((value) => !value)}
-                  className="min-h-8 text-xs font-medium text-accent hover:underline disabled:opacity-50"
-                >
-                  Prévia Markdown
-                </button>
-                <button
-                  type="button"
-                  disabled={busy || messages.length === 0}
-                  onClick={() => {
-                    setMessages([]);
-                    setDraft("");
-                    setPreview(false);
-                    setError("");
-                    setPhase("idle");
-                  }}
-                  className="inline-flex min-h-8 items-center gap-1 text-xs font-medium text-accent hover:underline disabled:opacity-50"
-                >
-                  <RefreshCcw01 className="size-3.5" aria-hidden="true" />
-                  Nova conversa
-                </button>
-              </div>
+              <button
+                type="button"
+                disabled={busy || messages.length === 0}
+                onClick={() => {
+                  setMessages([]);
+                  composerRef.current?.clear();
+                  setDraft("");
+                  setError("");
+                  setPhase("idle");
+                  composerRef.current?.focus();
+                }}
+                className="inline-flex min-h-8 items-center gap-1 text-xs font-medium text-accent hover:underline disabled:opacity-50"
+              >
+                <RefreshCcw01 className="size-3.5" aria-hidden="true" />
+                Nova conversa
+              </button>
             </div>
           </form>
         </section>

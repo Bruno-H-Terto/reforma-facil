@@ -77,10 +77,18 @@ Para arquitetura de Vercel Functions, consulte a [documentação da Vercel](http
 ### Conversa Markdown e continuidade
 
 O Reforminha interpreta Markdown/GFM nas mensagens: parágrafos, listas,
-tabelas, títulos, código e links. O campo de digitação aceita a sintaxe
-Markdown e oferece o botão **Prévia Markdown**. HTML fornecido pelo modelo
-não é renderizado, imagens externas não são carregadas e links clicáveis
-ficam restritos às rotas internas e às fontes oficiais permitidas.
+tabelas, títulos, código e links. O campo de digitação agora é um editor
+visual Tiptap com atalhos Markdown (por exemplo, digitar **palavra**
+com delimitadores Markdown converte o trecho para negrito), além de botões
+para negrito, itálico, título, listas e código. A formatação aparece
+diretamente durante a edição, sem abrir uma prévia separada. O editor
+converte o documento em Markdown antes do envio à API (não envia HTML).
+O código do editor é carregado sob demanda, quando o chat é aberto, e
+o rascunho é preservado quando o chat é recolhido.
+
+HTML fornecido pelo modelo não é renderizado, imagens externas não são
+carregadas e links clicáveis ficam restritos às rotas internas e às
+fontes oficiais permitidas.
 
 As últimas mensagens concluídas são enviadas como contexto do agente,
 com limite de quantidade e tamanho do payload. Mensagens que falharam no
