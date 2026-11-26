@@ -25,3 +25,8 @@ dist-ssr
 
 /test-results/
 /playwright-report/
+
+# Secrets and local environment
+.env
+.env.*
+!.env.example
