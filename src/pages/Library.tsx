@@ -1,17 +1,24 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { SearchLg } from "@untitledui/icons";
 import { card, field, PageIntro, Source } from "../components/ui";
 import { topics, reviewed, sources } from "../data/content";
-const categories = ["Todos", ...new Set(topics.map((t) => t.category))];
+const documents = topics.filter(
+  (t) => t.category !== "Atualizações" || t.title.includes("Manuais"),
+);
+const categories = ["Todos", ...new Set(documents.map((t) => t.category))];
 const normalize = (s: string) =>
   s
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
 export function Library() {
-  const [query, setQuery] = useState("");
+  const [params, setParams] = useSearchParams();
+  const query = params.get("q") ?? "";
+  const setQuery = (value: string) =>
+    setParams(value ? { q: value } : {}, { replace: true });
   const [category, setCategory] = useState("Todos");
-  const results = topics.filter(
+  const results = documents.filter(
     (t) =>
       (category === "Todos" || t.category === category) &&
       normalize(t.title + " " + t.text + " " + t.category).includes(
@@ -21,8 +28,8 @@ export function Library() {
   return (
     <>
       <PageIntro label="Fontes e atualizações" title="Biblioteca tributária">
-        Consulte normas, orientações e notícias selecionadas de fontes oficiais.
-        Revisão editorial: {reviewed}.
+        Consulte normas e guias de fontes oficiais. Revisão editorial:{" "}
+        {reviewed}.
       </PageIntro>
       <div className={card + " mb-6 grid gap-4 sm:grid-cols-[2fr_1fr]"}>
         <label className="text-sm font-medium">
@@ -63,7 +70,7 @@ export function Library() {
             Experimente outro termo ou selecione todas as categorias.
           </p>
           <button
-            className="rounded font-semibold text-accent underline active:bg-emerald-100 active:text-brand transition-colors"
+            className="rounded font-semibold text-accent underline active:bg-line active:text-brand transition-colors"
             onClick={() => {
               setQuery("");
               setCategory("Todos");
