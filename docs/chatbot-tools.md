@@ -10,27 +10,30 @@ Implementação baseada em `createAgent` e `tool` da documentação oficial:
 
 ```text
 api/
-├── chat.ts                  # Endpoint HTTP, valida entrada e devolve resposta
+└── chat.ts                         # Function HTTP publicada na Vercel
+server/
 ├── agent/
-│   ├── model.ts             # Instancia DeepSeek via .env.local
-│   └── agent.ts             # Registra createAgent({ model, tools, systemPrompt })
+│   ├── model.ts                    # Modelo DeepSeek
+│   └── agent.ts                    # createAgent e registro das tools
 └── tools/
-    ├── simulateTaxes.ts     # Tool 1: simulação determinística
-    ├── searchOfficialSources.ts # Tool 2: busca em fontes oficiais
-    ├── agentCapabilities.ts # Tool 3: exemplo do que o agente faz
+    ├── simulateTaxes.ts           # Cálculo determinístico
+    ├── searchOfficialSources.ts   # Busca de fontes oficiais
+    ├── agentCapabilities.ts       # Capacidades do agente
     └── regimes/
-        ├── shared.ts          # Contrato e fonte do conteúdo
-        ├── explainMei.ts     # Tool 4: MEI
-        ├── explainSimples.ts # Tool 5: Simples Nacional
-        ├── explainPresumido.ts # Tool 6: Lucro Presumido
-        └── explainReal.ts    # Tool 7: Lucro Real
+        ├── shared.ts
+        ├── explainMei.ts
+        ├── explainSimples.ts
+        ├── explainPresumido.ts
+        └── explainReal.ts
 ```
+
+A pasta api/ contém apenas o endpoint HTTP. Os módulos internos ficam em server/, carregados após validar a requisição para evitar falhas na inicialização do endpoint.
 
 Não existe um loop manual de tool calls. O LangChain cria o agente e gerencia as chamadas e suas respostas. O número de passos é limitado por `recursionLimit`; a execução tem um limite de tempo.
 
 ## Modelo DeepSeek
 
-A função `createDeepSeekModel()` é definida em `api/agent/model.ts` e recebe a chave somente no servidor:
+A função `createDeepSeekModel()` é definida em `server/agent/model.ts` e recebe a chave somente no servidor:
 
 ```env
 DEEPSEEK_API_KEY=sua_chave
@@ -41,7 +44,7 @@ A classe `ChatOpenAI` do LangChain é usada com `baseURL=https://api.deepseek.co
 
 ## Tool 1: simulate_taxes
 
-**Arquivo:** `api/tools/simulateTaxes.ts`
+**Arquivo:** `server/tools/simulateTaxes.ts`
 
 **Objetivo:** executar as mesmas fórmulas do portal, sem o LLM calcular valores diretamente.
 
@@ -73,7 +76,7 @@ Quando um parâmetro está faltando, retorna `status: "missing_inputs"` com a li
 
 ## Tool 2: search_official_sources
 
-**Arquivo:** `api/tools/searchOfficialSources.ts`
+**Arquivo:** `server/tools/searchOfficialSources.ts`
 
 **Objetivo:** consultar fontes tributárias atuais com uma pesquisa na internet.
 
@@ -89,7 +92,7 @@ Se a chave não estiver definida ou a consulta falhar, retorna `status: "unavail
 
 ## Tool 3: agent_capabilities
 
-**Arquivo:** `api/tools/agentCapabilities.ts`
+**Arquivo:** `server/tools/agentCapabilities.ts`
 
 **Objetivo:** ferramenta demonstrativa para responder à pergunta “O que você consegue fazer?”.
 
@@ -102,7 +105,7 @@ Essa função não faz chamadas externas e não requer chave. É um exemplo veri
 ## Como o agente é iniciado
 
 ```typescript
-// api/agent/agent.ts — visão simplificada
+// server/agent/agent.ts — visão simplificada
 export const agentTools = [
   simulateTaxes,
   searchOfficialSources,
@@ -152,10 +155,10 @@ acordo com o regime informado, sem presumir que MEI e Simples ME/EPP são iguais
 
 | Tool | Arquivo | Pergunta de exemplo |
 |---|---|---|
-| `explain_mei_changes` | `api/tools/regimes/explainMei.ts` | O que muda para o MEI? |
-| `explain_simples_changes` | `api/tools/regimes/explainSimples.ts` | O que muda no Simples Nacional? |
-| `explain_presumed_changes` | `api/tools/regimes/explainPresumido.ts` | E o Lucro Presumido? |
-| `explain_real_changes` | `api/tools/regimes/explainReal.ts` | Quais mudanças no Lucro Real? |
+| `explain_mei_changes` | `server/tools/regimes/explainMei.ts` | O que muda para o MEI? |
+| `explain_simples_changes` | `server/tools/regimes/explainSimples.ts` | O que muda no Simples Nacional? |
+| `explain_presumed_changes` | `server/tools/regimes/explainPresumido.ts` | E o Lucro Presumido? |
+| `explain_real_changes` | `server/tools/regimes/explainReal.ts` | Quais mudanças no Lucro Real? |
 
 **Entrada comum:** `{"topico": "resumo"}`. O campo pode assumir `resumo`
 (padrão), `exemplo`, `cuidados` ou `completo`.

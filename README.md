@@ -19,10 +19,10 @@ Os testes E2E utilizam Google Chrome instalado (desktop e emulação móvel). O 
 - src/pages: início, guia, empresas, MEI, notícias, biblioteca, simuladores, calculadoras e página 404.
 - src/data/content.ts: conteúdo, links oficiais, cronograma e revisão editorial.
 - src/lib/scenarios.ts: função pura do simulador.
-- api/chat.ts: endpoint HTTP da Vercel (validação da requisição).
-- api/agent/model.ts: bootstrap do modelo DeepSeek via variáveis de ambiente.
-- api/agent/agent.ts: agente LangChain (createAgent) e registro das 7 tools.
-- api/tools/: funções independentes de simulação, busca, capacidades e explicação de mudanças por regime.
+- api/chat.ts: único endpoint HTTP da Vercel (validação e carregamento tardio do agente).
+- server/agent/model.ts: bootstrap do modelo DeepSeek via variáveis de ambiente.
+- server/agent/agent.ts: agente LangChain (createAgent) e registro das 7 tools.
+- server/tools/: funções independentes de simulação, busca, capacidades e explicação de mudanças por regime.
 - docs/chatbot-tools.md: documentação dos schemas, exemplos e arquitetura.
 - src/components/chat/ReforminhaChat.tsx: interface de conversa com animação por estados.
 - src/pages/NotFound.tsx: página pública de erro 404, com a ilustração do Reforminha.
@@ -53,7 +53,7 @@ A interface está disponível no canto inferior direito em todas as telas. O íc
 
 Em **Project → Settings → Environment Variables**, defina `DEEPSEEK_API_KEY`, `DEEPSEEK_MODEL`. Também é possível usar `APP_ORIGIN` para restringir a origem de requisições do navegador. Faça um novo deploy para as variáveis entrarem em vigor.
 
-A função `api/chat.ts` delega ao agente LangChain `createAgent` em `api/agent/agent.ts`. A inicialização e as ferramentas ficam em módulos separados, documentados em `docs/chatbot-tools.md`.
+A função `api/chat.ts` delega ao agente LangChain `createAgent` em `server/agent/agent.ts`. A inicialização e as ferramentas ficam em módulos separados, documentados em `docs/chatbot-tools.md`.
 
 ### Limitações e segurança
 

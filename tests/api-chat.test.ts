@@ -3,15 +3,15 @@ import { test } from "node:test";
 import { AIMessage, ToolMessage } from "@langchain/core/messages";
 import { fakeModel } from "@langchain/core/testing";
 import { handleRequest } from "../api/chat.ts";
-import { createDeepSeekModel } from "../api/agent/model.ts";
-import { agentTools, createReforminhaAgent } from "../api/agent/agent.ts";
-import { simulateTaxes } from "../api/tools/simulateTaxes.ts";
-import { searchOfficialSources } from "../api/tools/searchOfficialSources.ts";
-import { agentCapabilities } from "../api/tools/agentCapabilities.ts";
-import { explainMeiChanges } from "../api/tools/regimes/explainMei.ts";
-import { explainSimplesChanges } from "../api/tools/regimes/explainSimples.ts";
-import { explainPresumedChanges } from "../api/tools/regimes/explainPresumido.ts";
-import { explainRealChanges } from "../api/tools/regimes/explainReal.ts";
+import { createDeepSeekModel } from "../server/agent/model.ts";
+import { agentTools, createReforminhaAgent } from "../server/agent/agent.ts";
+import { simulateTaxes } from "../server/tools/simulateTaxes.ts";
+import { searchOfficialSources } from "../server/tools/searchOfficialSources.ts";
+import { agentCapabilities } from "../server/tools/agentCapabilities.ts";
+import { explainMeiChanges } from "../server/tools/regimes/explainMei.ts";
+import { explainSimplesChanges } from "../server/tools/regimes/explainSimples.ts";
+import { explainPresumedChanges } from "../server/tools/regimes/explainPresumido.ts";
+import { explainRealChanges } from "../server/tools/regimes/explainReal.ts";
 
 function makeRequest(body: unknown, method = "POST"): Request {
   return new Request("http://localhost:3000/api/chat", {

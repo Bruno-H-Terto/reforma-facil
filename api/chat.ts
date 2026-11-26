@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { runReforminhaAgent } from "./agent/agent.ts";
 
 /**
  * Endpoint HTTP da Vercel: somente valida requisições e chama o agente.
@@ -102,11 +101,24 @@ export async function handleRequest(request: Request): Promise<Response> {
   }
 
   try {
+    // Importar o agente somente depois da validação da requisição evita que
+    // falhas em dependências do modelo derrubem a função antes de responder.
+    // A pasta server/ é compartilhada: apenas api/chat.ts vira endpoint HTTP.
+    const { runReforminhaAgent } = await import("../server/agent/agent.ts");
     return json(
       { answer: await runReforminhaAgent(parsed.data.messages) },
       200,
     );
-  } catch {
+  } catch (error) {
+    // O usuário recebe apenas uma mensagem genérica; o diagnóstico fica nos
+    // logs privados da Function e nunca expõe o valor de DEEPSEEK_API_KEY.
+    const cause =
+      error instanceof Error ? error : new Error("Erro desconhecido");
+    const apiKey = process.env.DEEPSEEK_API_KEY?.trim();
+    const message = apiKey
+      ? cause.message.replaceAll(apiKey, "[redacted]")
+      : cause.message;
+    console.error("[reforminha/chat] Falha no agente:", cause.name, message);
     return json(
       {
         error:

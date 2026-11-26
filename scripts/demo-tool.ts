@@ -10,7 +10,7 @@
  */
 import { AIMessage, ToolMessage } from "@langchain/core/messages";
 import { fakeModel } from "@langchain/core/testing";
-import { agentTools, createReforminhaAgent } from "../api/agent/agent.ts";
+import { agentTools, createReforminhaAgent } from "../server/agent/agent.ts";
 
 const options = {
   capabilities: {
