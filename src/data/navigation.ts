@@ -9,12 +9,12 @@ export const areas: Item[] = [
   {
     label: "Minha empresa",
     to: "/empresas",
-    match: (p) => p.startsWith("/empresas") || p === "/mei" || p === "/estados",
+    match: (p) => p.startsWith("/empresas"),
   },
   {
     label: "Simular",
     to: "/simulador",
-    match: (p) => p.startsWith("/simulador") || p.startsWith("/calculadoras"),
+    match: (p) => p.startsWith("/simulador"),
   },
   {
     label: "Fontes oficiais",

@@ -1,14 +1,6 @@
 import { useId, useState } from "react";
 import { FieldInfo } from "../components/FieldInfo";
-import { useParams } from "react-router-dom";
-import {
-  Action,
-  PageIntro,
-  SectionTitle,
-  Source,
-  card,
-  field,
-} from "../components/ui";
+import { Action, SectionTitle, Source, card, field } from "../components/ui";
 import { CurrencyInput } from "../components/CurrencyInput";
 import {
   annexTables,
@@ -65,7 +57,7 @@ function Results({ items }: { items: [string, string][] }) {
     </div>
   );
 }
-function DasCalculator({ initial }: { initial: Annex }) {
+export function DasCalculator({ initial }: { initial: Annex }) {
   const [selected, setSelected] = useState<Annex | "factor">(initial);
   const [rbt, setRbt] = useState("300000");
   const [month, setMonth] = useState("25000");
@@ -561,43 +553,5 @@ export function RealCalculator({
         </Action>
       )}
     </section>
-  );
-}
-export function TaxCalculators() {
-  const { regime, annex } = useParams();
-  const active =
-    regime === "presumido" || regime === "real" ? regime : "simples";
-  const initial =
-    annex && Object.hasOwn(annexTables, annex.toUpperCase())
-      ? (annex.toUpperCase() as Annex)
-      : "III";
-  return (
-    <div className="space-y-7">
-      <PageIntro
-        label="Calculadoras tributárias"
-        title="Calcule os tributos da sua empresa"
-      >
-        Escolha o regime para uma estimativa com regras e fontes oficiais. O DAS
-        e os tributos sobre renda são diferentes da simulação de IBS/CBS.
-      </PageIntro>
-      {active === "simples" ? (
-        <DasCalculator key={initial} initial={initial} />
-      ) : active === "presumido" ? (
-        <PresumedCalculator />
-      ) : (
-        <RealCalculator />
-      )}
-      <section className={card}>
-        <SectionTitle title="Outras ferramentas" />
-        <div className="flex flex-wrap gap-3">
-          <Action to="/empresas?regime=mei">MEI — DAS fixo</Action>
-          <Action to="/simulador">Reforma — simulação de IBS/CBS</Action>
-        </div>
-        <p className="mt-4 text-sm text-slate-600">
-          Estimativas educativas, não substituem PGDAS-D, ECF ou apuração fiscal
-          profissional. Revisão das regras: 25/11/2026.
-        </p>
-      </section>
-    </div>
   );
 }

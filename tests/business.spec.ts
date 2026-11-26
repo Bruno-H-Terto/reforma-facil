@@ -1,47 +1,73 @@
 import { test, expect } from "@playwright/test";
-test("navegação por regime, anexo e perfil", async ({ page }) => {
+test("rotas antigas de regimes e anexos são recuperadas e perfis descontinuados redirecionam", async ({
+  page,
+}) => {
   await page.goto("/empresas/regimes/simples-nacional");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Simples Nacional",
-  );
-  await page.getByRole("link", { name: /Anexo IV/ }).click();
-  await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Anexo IV",
-  );
-  await page.getByRole("button", { name: "Visão técnica" }).click();
+  await expect(page).toHaveURL(/\/empresas\?regime=simples-nacional$/);
   await expect(
-    page.getByRole("button", { name: "Visão técnica" }),
-  ).toHaveAttribute("aria-pressed", "true");
+    page.getByRole("tab", { name: "Simples Nacional" }),
+  ).toHaveAttribute("aria-selected", "true");
+
+  await page.goto("/empresas/anexos/anexo-iv");
+  await expect(page).toHaveURL(
+    /regime=simples-nacional&anexo=anexo-iv#anexos$/,
+  );
+  await expect(page.getByLabel("Anexo da atividade")).toHaveValue("anexo-iv");
   await expect(
-    page.getByRole("heading", { name: "Impacto fiscal e operacional" }),
+    page.getByText(/CPP permanece uma obrigação separada/),
   ).toBeVisible();
-  await page.goto("/empresas/regimes/lucro-presumido");
-  await page.getByRole("link", { name: /Empresa júnior/ }).click();
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Empresa júnior",
+
+  await page.goto("/empresas/perfis/empresa-junior");
+  await expect(page).toHaveURL(/\/empresas$/);
+  await expect(page.getByText("Orientações por perfil de negócio")).toHaveCount(
+    0,
   );
 });
-test("estados e simulação regional não compensam créditos entre tributos", async ({
+test("região foi integrada à Minha empresa e URL antiga não abre página paralela", async ({
   page,
 }) => {
   await page.goto("/estados");
-  await page.getByRole("button", { name: /3º · MG/ }).click();
-  await expect(page.getByRole("button", { name: /3º · MG/ })).toHaveAttribute(
-    "aria-pressed",
-    "true",
-  );
+  await expect(page).toHaveURL(/\/empresas#impacto-regional$/);
+
+  const section = page.getByRole("region", {
+    name: "O que muda no seu estado?",
+  });
+  await expect(section).toBeVisible();
+  const select = section.getByLabel("Estado da operação");
+  await expect(select.locator("option")).toHaveCount(28);
+
+  await select.selectOption("MG");
   await expect(
-    page.getByText(/Fábrica de móveis em Juiz de Fora/),
+    section.getByText("Minas Gerais", { exact: true }),
   ).toBeVisible();
-  await page.getByLabel("Créditos elegíveis de IBS").first().fill("2000");
-  await page.getByLabel("Créditos elegíveis de CBS").first().fill("0");
-  await expect(page.getByText("R$ 1.130,00", { exact: true })).toBeVisible();
-  await page.getByLabel("Selecione qualquer UF").selectOption("AC");
   await expect(
-    page.getByRole("heading", { name: "Acre", exact: true }),
+    section.getByText(/Fábrica de móveis em Juiz de Fora/),
   ).toBeVisible();
+  await expect(
+    section.getByRole("link", { name: "Notícias do estado" }),
+  ).toHaveAttribute("href", "/noticias?uf=MG");
+
+  await select.selectOption("AC");
+  await expect(section.getByText("Acre", { exact: true })).toBeVisible();
+  await expect(
+    section.getByText(/Ainda não há um exemplo revisado/),
+  ).toBeVisible();
+  await expect(section.getByRole("textbox")).toHaveCount(0);
+  await expect(section.getByRole("spinbutton")).toHaveCount(0);
 });
 
+test("contexto regional é acessível pelas áreas já existentes", async ({
+  page,
+}) => {
+  await page.goto("/simulador");
+  await page
+    .getByRole("link", { name: /Consulte os exemplos na seção Minha empresa/ })
+    .click();
+  await expect(page).toHaveURL(/\/empresas#impacto-regional$/);
+  await expect(
+    page.getByRole("region", { name: "O que muda no seu estado?" }),
+  ).toBeVisible();
+});
 test("Minha empresa funciona como single page por abas e sem collapses", async ({
   page,
 }) => {

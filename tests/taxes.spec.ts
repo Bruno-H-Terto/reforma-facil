@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 test("DAS por faixa, fator R e sublimite", async ({ page }) => {
   await page.goto("/calculadoras/simples");
+  await expect(page).toHaveURL(/\/simulador\?modo=das#das-detalhado$/);
   await expect(page.getByText("R$ 2.020,00", { exact: true })).toBeVisible();
   await page.getByLabel("Anexo ou atividade").selectOption("factor");
   await expect(page.getByText(/28% → Anexo III/)).toBeVisible();
@@ -8,7 +9,7 @@ test("DAS por faixa, fator R e sublimite", async ({ page }) => {
   await expect(page.getByText(/20% → Anexo V/)).toBeVisible();
   await page.getByLabel("Receita dos últimos 12 meses").fill("4000000");
   await expect(page.getByRole("status")).toContainText("Confirme o tratamento");
-  await page.getByRole("checkbox").check();
+  await page.locator("#das-detailed-panel").getByRole("checkbox").check();
   await expect(page.getByText("DAS estimado do mês")).toBeVisible();
   await page.getByLabel("Receita dos últimos 12 meses").fill("5000000");
   await expect(page.getByRole("status")).toContainText("acima do teto");

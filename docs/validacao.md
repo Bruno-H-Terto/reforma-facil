@@ -91,3 +91,10 @@ com uma chave real do DeepSeek. Os testes automatizados não substituem revisão
 jurídica/contábil, testes de uso com empresários ou validação por leitor de
 tela. O uso público da API deve ser precedido de limites persistentes de
 requisições e cotas de custos.
+
+## Consolidação das rotas — 26/11/2026 (versão atual)
+
+As seções anteriores registram a arquitetura de versões passadas. Nesta
+versão, estado, MEI, regime/anexo/perfil e calculadoras foram integrados às
+páginas Minha empresa e Simular. Os URLs históricos funcionam como aliases.
+Ver inventário e testes da versão atual em navigation-audit.md.

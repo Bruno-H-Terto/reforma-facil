@@ -17,7 +17,11 @@ import { quickDas } from "../lib/quickDas";
 import { activities } from "../data/simplesActivities";
 import { RegimeTabs } from "../components/business/BusinessSections";
 import { Simulator } from "./Simulator";
-import { PresumedCalculator, RealCalculator } from "./TaxCalculators";
+import {
+  DasCalculator,
+  PresumedCalculator,
+  RealCalculator,
+} from "./TaxCalculators";
 import { RegularConsumptionCalculator } from "../components/business/RegularConsumptionCalculator";
 const money = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -104,7 +108,13 @@ export function QuickSimulator() {
         alíquota-padrão do IBS na transição é igual em todas as UFs, quando
         aplicável; selecionar outro estado, por si só, não altera o DAS
         estimado. A partir de 2029, a tributação poderá depender de alíquotas
-        regionais e regras específicas que ainda não integram estes cálculos.
+        regionais e regras específicas que ainda não integram estes cálculos.{" "}
+        <Link
+          to="/empresas#impacto-regional"
+          className="font-semibold text-accent underline underline-offset-2"
+        >
+          Consulte os exemplos na seção Minha empresa.
+        </Link>
       </aside>
       <RegimeTabs
         items={simulatorTabs}
@@ -175,6 +185,16 @@ function SimpleNationalPanel({
   const [detail, setDetail] = useState<"das" | "hibrido">(
     initialComparison ? "hibrido" : "das",
   );
+  const location = useLocation();
+  const [params] = useSearchParams();
+  const [detailedOpen, setDetailedOpen] = useState(
+    () => location.hash === "#das-detalhado",
+  );
+  const requestedAnnex = params.get("anexo")?.toUpperCase();
+  const initialDasAnnex: Annex =
+    requestedAnnex && Object.hasOwn(annexTables, requestedAnnex)
+      ? (requestedAnnex as Annex)
+      : "III";
   // Links antigos que abrem ?modo=comparar selecionam a explicação correspondente.
   const selected = detail;
   return (
@@ -217,8 +237,30 @@ function SimpleNationalPanel({
           Simples Híbrido: IBS/CBS fora do DAS
         </button>
       </div>
-      <div hidden={selected !== "das"}>
+      <div hidden={selected !== "das"} className="space-y-5">
         <QuickDasSimulator />
+        <section
+          id="das-detalhado"
+          className="scroll-mt-24 space-y-4"
+          aria-label="Calculadora detalhada do DAS em 2026"
+        >
+          <button
+            type="button"
+            aria-controls="das-detailed-panel"
+            aria-expanded={detailedOpen}
+            onClick={() => setDetailedOpen((open) => !open)}
+            className="rounded-lg border border-line-strong px-4 py-2.5 text-sm font-semibold text-brand hover:bg-soft"
+          >
+            {detailedOpen
+              ? "Ocultar cálculo detalhado do DAS de 2026"
+              : "Cálculo detalhado do DAS de 2026 (faixas e fator R)"}
+          </button>
+          {detailedOpen && (
+            <div id="das-detailed-panel">
+              <DasCalculator initial={initialDasAnnex} />
+            </div>
+          )}
+        </section>
       </div>
       <div hidden={selected !== "hibrido"}>
         <Simulator embedded />

@@ -21,7 +21,7 @@ Os testes E2E utilizam Google Chrome instalado (desktop e emulação móvel). O 
 ## Organização
 
 - src/components: layout, navegação, componentes visuais e FAQ (React Aria).
-- src/pages: início, guia, empresas, MEI, notícias, biblioteca, simuladores, calculadoras e página 404.
+- src/pages: início, guia, empresas, notícias, biblioteca, simuladores e página 404. MEI, estados, perfis e calculadoras estão integrados às áreas Minha empresa e Simular; URLs históricas redirecionam para essas seções.
 - src/data/content.ts: conteúdo, links oficiais, cronograma e revisão editorial.
 - src/lib/scenarios.ts: função pura do simulador.
 - api/chat.ts: único endpoint HTTP da Vercel (validação e carregamento tardio do agente).
@@ -106,3 +106,10 @@ Veja [docs/chatbot-tools.md](docs/chatbot-tools.md) para os esquemas de entrada,
 limitações, fontes e exemplos das sete ferramentas. Use `npm run demo:tool` para
 testar o ciclo de `createAgent` com um modelo falso, sem credenciais nem custos.
 Use `npm run test:api` para executar os testes das funções e do agente.
+
+### Navegação e rotas de compatibilidade
+
+A navegação pública utiliza cinco destinos principais. Regimes, anexos,
+perfis, MEI e informações regionais integram Minha empresa. As calculadoras
+integram Simular. Endereços antigos como /estados, /mei e /calculadoras/simples
+redirecionam para as respectivas seções. Ver docs/navigation-audit.md.

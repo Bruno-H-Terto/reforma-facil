@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 test("MEI: limite, proporcionalidade, DAS e notícias", async ({ page }) => {
   await page.goto("/mei");
+  await expect(page).toHaveURL(/\/empresas\?regime=mei#calculadora-mei$/);
   await expect(page.getByText(/Acima do limite de receita em/)).toContainText(
     "R$ 9.000,00",
   );
@@ -12,7 +13,10 @@ test("MEI: limite, proporcionalidade, DAS e notícias", async ({ page }) => {
   await expect(page.getByText(/Limite aplicável/)).toContainText(
     "R$ 55.000,02",
   );
-  await page.getByLabel("Atividade", { exact: true }).selectOption("mixed");
+  // Os três valores do DAS já estão visíveis na aba MEI, sem seletor duplicado.
+  await expect(
+    page.getByRole("heading", { name: "Limite de faturamento e DAS do MEI" }),
+  ).toBeVisible();
   await expect(page.getByText("R$ 87,05", { exact: true })).toBeVisible();
   await page
     .getByLabel("INSS elegível, incluindo encargos (exemplo)")

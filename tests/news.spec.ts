@@ -21,6 +21,10 @@ test("serviços: referência e redução condicional com valores editáveis", as
   page,
 }) => {
   await page.goto("/empresas/regimes/simples-nacional");
+  await expect(page).toHaveURL(/\/empresas\?regime=simples-nacional$/);
+  await page
+    .getByRole("button", { name: "Ver exemplos de serviços e créditos" })
+    .click();
   await expect(
     page.getByRole("heading", {
       name: "Prestação de serviços: casos práticos",
