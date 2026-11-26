@@ -1,3 +1,4 @@
+import { cbsReference } from "../data/rates";
 export type Scenario = {
   revenue: number;
   operationBase: number;
@@ -14,7 +15,7 @@ export const defaults: Scenario = {
   dasInside: 8,
   dasOutside: 5,
   ibsRate: 5,
-  cbsRate: 10,
+  cbsRate: cbsReference,
   ibsCredit: 1000,
   cbsCredit: 3000,
 };

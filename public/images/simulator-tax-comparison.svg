@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" fill="none" role="img" aria-labelledby="title">
+<title id="title">Ilustração de cálculos tributários e comparação de dois cenários</title>
+<path d="M73 201C35 160 78 115 118 108c37-7 55-37 85-60 47-36 102-31 145 15 37 39 33 71 64 109 26 31 18 77-38 86H128c-56 0-79-28-55-57Z" fill="#FCE8BE"/>
+<rect x="104" y="46" width="198" height="215" rx="19" fill="#fffdfa" stroke="#102F49" stroke-width="5"/>
+<rect x="124" y="70" width="158" height="50" rx="8" fill="#E8F1F6"/>
+<path d="M145 96h68m-68 12h99" stroke="#6F9EB8" stroke-width="5" stroke-linecap="round"/>
+<rect x="126" y="140" width="41" height="35" rx="6" fill="#E8F1F6" stroke="#102F49" stroke-width="2.4"/>
+<rect x="182" y="140" width="41" height="35" rx="6" fill="#E8F1F6" stroke="#102F49" stroke-width="2.4"/>
+<rect x="238" y="140" width="41" height="35" rx="6" fill="#E8F1F6" stroke="#102F49" stroke-width="2.4"/>
+<rect x="126" y="188" width="41" height="35" rx="6" fill="#E8F1F6" stroke="#102F49" stroke-width="2.4"/>
+<rect x="182" y="188" width="41" height="35" rx="6" fill="#E8F1F6" stroke="#102F49" stroke-width="2.4"/>
+<rect x="238" y="188" width="41" height="35" rx="6" fill="#E8F1F6" stroke="#102F49" stroke-width="2.4"/>
+<path d="M323 115h79" stroke="#102F49" stroke-width="6" stroke-linecap="round"/>
+<path d="M361 111v89M338 142l-16 29h34l-18-29Zm47 0-17 29h35l-18-29Z" stroke="#102F49" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M317 173c3 12 13 19 21 19s18-7 21-19h-42Zm50 0c3 12 13 19 21 19s18-7 21-19h-42Z" fill="#F1B740"/>
+<path d="M333 203h56v10h-56zM322 219h77v11h-77z" fill="#102F49"/>
+<path d="M145 248h108" stroke="#F1B740" stroke-width="6" stroke-linecap="round"/>
+<circle cx="366" cy="79" r="24" fill="#F1B740"/>
+<path d="M356 80l7 7 14-16" stroke="#102F49" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
