@@ -101,6 +101,11 @@
 }
 
 /* Editor Markdown WYSIWYG do chat: estilo restrito ao campo de digitação. */
+/* O foco pertence ao contêiner do editor, não ao conteúdo recortado. */
+.chat-md-composer .tiptap:focus-visible {
+  outline: none;
+}
+
 .chat-md-composer .tiptap p {
   margin: 0;
 }

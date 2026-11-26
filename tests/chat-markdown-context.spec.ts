@@ -346,3 +346,27 @@ test("barra atualiza ao mover a seleção entre texto formatado e simples", asyn
   await textbox.press("End");
   await expect(bold).toHaveAttribute("aria-pressed", "false");
 });
+
+test("campo de mensagem mantém foco visual apenas na borda externa", async ({
+  page,
+}) => {
+  const { dialog, textbox } = await openChat(page);
+  await textbox.focus();
+  await expect(textbox).toBeFocused();
+  await expect(dialog.locator(".chat-md-composer")).toBeVisible();
+  const styles = await textbox.evaluate((element) => ({
+    outlineStyle: getComputedStyle(element).outlineStyle,
+    outerOutlineStyle: getComputedStyle(element.closest(".chat-md-composer")!)
+      .outlineStyle,
+  }));
+  expect(styles.outlineStyle).toBe("none");
+  expect(styles.outerOutlineStyle).not.toBe("none");
+  await textbox.fill("Primeira linha");
+  await textbox.press("Enter");
+  await textbox.type("Segunda linha");
+  await expect(textbox).toContainText("Primeira linha");
+  await expect(textbox).toContainText("Segunda linha");
+  await expect(
+    dialog.getByRole("button", { name: "Enviar mensagem" }),
+  ).toBeEnabled();
+});
