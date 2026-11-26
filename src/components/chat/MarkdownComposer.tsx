@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
-import { EditorContent, useEditor } from "@tiptap/react";
+import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Markdown } from "@tiptap/markdown";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -72,6 +72,21 @@ export const MarkdownComposer = forwardRef<MarkdownComposerHandle, Props>(
       onUpdate: ({ editor: current }) => onChange(current.getMarkdown()),
     });
 
+    // A instância do editor não provoca re-render a cada transação.
+    // Observar o estado do ProseMirror atualiza os botões imediatamente após
+    // clicar, trocar a seleção ou entrar/sair de um trecho formatado.
+    const formatting = useEditorState({
+      editor,
+      selector: ({ editor: current }) => ({
+        bold: current?.isActive("bold") ?? false,
+        italic: current?.isActive("italic") ?? false,
+        heading: current?.isActive("heading", { level: 2 }) ?? false,
+        bulletList: current?.isActive("bulletList") ?? false,
+        orderedList: current?.isActive("orderedList") ?? false,
+        code: current?.isActive("code") ?? false,
+      }),
+    });
+
     useEffect(() => {
       editor?.setEditable(!disabled);
     }, [editor, disabled]);
@@ -100,7 +115,7 @@ export const MarkdownComposer = forwardRef<MarkdownComposerHandle, Props>(
         title: "Negrito (Ctrl+B)",
         text: "B",
         className: "font-bold",
-        active: editor?.isActive("bold"),
+        active: formatting?.bold,
         action: () => editor?.chain().focus().toggleBold().run(),
       },
       {
@@ -108,7 +123,7 @@ export const MarkdownComposer = forwardRef<MarkdownComposerHandle, Props>(
         title: "Itálico (Ctrl+I)",
         text: "I",
         className: "italic",
-        active: editor?.isActive("italic"),
+        active: formatting?.italic,
         action: () => editor?.chain().focus().toggleItalic().run(),
       },
       {
@@ -116,7 +131,7 @@ export const MarkdownComposer = forwardRef<MarkdownComposerHandle, Props>(
         title: "Título de seção",
         text: "H",
         className: "font-semibold",
-        active: editor?.isActive("heading", { level: 2 }),
+        active: formatting?.heading,
         action: () => editor?.chain().focus().toggleHeading({ level: 2 }).run(),
       },
       {
@@ -124,7 +139,7 @@ export const MarkdownComposer = forwardRef<MarkdownComposerHandle, Props>(
         title: "Lista com marcadores",
         text: "•",
         className: "font-semibold",
-        active: editor?.isActive("bulletList"),
+        active: formatting?.bulletList,
         action: () => editor?.chain().focus().toggleBulletList().run(),
       },
       {
@@ -132,7 +147,7 @@ export const MarkdownComposer = forwardRef<MarkdownComposerHandle, Props>(
         title: "Lista numerada",
         text: "1.",
         className: "font-semibold",
-        active: editor?.isActive("orderedList"),
+        active: formatting?.orderedList,
         action: () => editor?.chain().focus().toggleOrderedList().run(),
       },
       {
@@ -140,7 +155,7 @@ export const MarkdownComposer = forwardRef<MarkdownComposerHandle, Props>(
         title: "Código",
         text: "</>",
         className: "font-mono text-[10px]",
-        active: editor?.isActive("code"),
+        active: formatting?.code,
         action: () => editor?.chain().focus().toggleCode().run(),
       },
     ];

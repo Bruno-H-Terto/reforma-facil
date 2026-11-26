@@ -263,3 +263,72 @@ test("rascunho formatado permanece ao recolher e reabrir o chat", async ({
   await expect(reopened.getByText("Recebido.")).toBeVisible();
   expect(received).toBe("**Rascunho**");
 });
+
+test("botão Negrito ativa e desativa imediatamente, antes de digitar", async ({
+  page,
+}) => {
+  const { dialog, textbox } = await openChat(page);
+  const bold = dialog.getByRole("button", { name: "Negrito" });
+
+  await expect(bold).toHaveAttribute("aria-pressed", "false");
+  await bold.click();
+  await expect(bold).toHaveAttribute("aria-pressed", "true");
+  await expect(bold).toHaveClass(/ring-1/);
+
+  // A formatação deve ser aplicada sem precisar digitar para ativar o botão.
+  await textbox.pressSequentially("Tributo", { delay: 10 });
+  await expect(textbox.locator("strong")).toHaveText("Tributo");
+  await expect(bold).toHaveAttribute("aria-pressed", "true");
+
+  await bold.click();
+  await expect(bold).toHaveAttribute("aria-pressed", "false");
+  await expect(bold).not.toHaveClass(/ring-1/);
+
+  // Desativado, o texto seguinte não deve receber negrito.
+  await textbox.pressSequentially(" normal");
+  await expect(textbox.locator("strong")).toHaveText("Tributo");
+  await expect(textbox).toContainText("Tributo normal");
+  await expect(bold).toHaveAttribute("aria-pressed", "false");
+});
+
+test("todos os controles refletem imediatamente o estado ao clicar novamente", async ({
+  page,
+}) => {
+  const { dialog, textbox } = await openChat(page);
+  const names = [
+    "Itálico",
+    "Título",
+    "Lista com marcadores",
+    "Lista numerada",
+    "Código",
+  ];
+  for (const name of names) {
+    const button = dialog.getByRole("button", { name, exact: true });
+    await textbox.fill("");
+    await expect(button).toHaveAttribute("aria-pressed", "false");
+    await button.click();
+    await expect(button).toHaveAttribute("aria-pressed", "true");
+    await expect(button).toHaveClass(/ring-1/);
+    await button.click();
+    await expect(button).toHaveAttribute("aria-pressed", "false");
+    await expect(button).not.toHaveClass(/ring-1/);
+  }
+});
+
+test("barra atualiza ao mover a seleção entre texto formatado e simples", async ({
+  page,
+}) => {
+  const { dialog, textbox } = await openChat(page);
+  const bold = dialog.getByRole("button", { name: "Negrito" });
+
+  await textbox.fill("");
+  await textbox.pressSequentially("**bold** comum", { delay: 10 });
+  await expect(textbox.locator("strong")).toHaveText("bold");
+
+  // Mover a seleção deve atualizar o indicador mesmo sem alterar o texto.
+  await textbox.locator("strong").click();
+  await expect(bold).toHaveAttribute("aria-pressed", "true");
+
+  await textbox.press("End");
+  await expect(bold).toHaveAttribute("aria-pressed", "false");
+});
