@@ -64,3 +64,22 @@ test("2028 não calcula total de CBS sem alíquota definida", async ({
     simulator.getByRole("button", { name: "Calcular cenários" }),
   ).toBeEnabled();
 });
+
+test("memória de cálculo mostra as mesmas alíquotas usadas no resultado", async ({
+  page,
+}) => {
+  await page.goto("/simulador/avancado");
+  await page
+    .locator("summary")
+    .filter({ hasText: "Memória de cálculo" })
+    .click();
+  const memory = page.locator("details").filter({
+    has: page.getByRole("heading", { name: "Memória de cálculo" }),
+  });
+  await expect(
+    memory.getByText("R$ 50.000,00 × 0,1%", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    memory.getByText("R$ 50.000,00 × 11,2%", { exact: true }),
+  ).toBeVisible();
+});

@@ -175,8 +175,8 @@ export function Simulator({ embedded = false }: { embedded?: boolean }) {
     },
     ...(
       [
-        ["IBS", c.ibs, result.ibsRate],
-        ["CBS", c.cbs, result.cbsRate],
+        ["IBS", c.ibs, ibsRate],
+        ["CBS", c.cbs, cbsRate ?? 0],
       ] as const
     ).flatMap(([name, tax, rate]) => [
       {
