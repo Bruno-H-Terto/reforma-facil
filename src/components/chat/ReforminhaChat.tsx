@@ -71,7 +71,9 @@ export function ReforminhaChat() {
 
   const close = () => {
     setOpen(false);
-    launchRef.current?.focus();
+    // No mobile, o disparador fica oculto enquanto a conversa está aberta.
+    // Devolva o foco somente após a renderização que torna o botão visível.
+    requestAnimationFrame(() => launchRef.current?.focus());
   };
 
   const send = async (event?: FormEvent) => {
@@ -154,9 +156,9 @@ export function ReforminhaChat() {
           onKeyDown={(event) => {
             if (event.key === "Escape") close();
           }}
-          className="absolute bottom-[5.25rem] right-0 flex h-[min(39rem,calc(100dvh-7rem))] w-[min(25rem,calc(100vw-2rem))] min-w-0 flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-2xl"
+          className="fixed inset-0 flex h-dvh w-screen min-w-0 flex-col overflow-hidden bg-surface shadow-2xl sm:absolute sm:inset-auto sm:bottom-[5.25rem] sm:right-0 sm:h-[min(39rem,calc(100dvh-7rem))] sm:w-[min(25rem,calc(100vw-2rem))] sm:rounded-2xl sm:border sm:border-line"
         >
-          <header className="flex shrink-0 items-center gap-3 border-b border-line bg-soft px-4 py-3">
+          <header className="flex shrink-0 items-center gap-3 border-b border-line bg-soft px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:py-3">
             <img
               src={avatar[phase]}
               alt=""
@@ -279,7 +281,7 @@ export function ReforminhaChat() {
           <form
             ref={formRef}
             onSubmit={(event) => void send(event)}
-            className="shrink-0 border-t border-line bg-surface p-3"
+            className="shrink-0 border-t border-line bg-surface px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:p-3"
           >
             <div className="flex items-end gap-2">
               <Suspense
@@ -346,7 +348,10 @@ export function ReforminhaChat() {
           if (open) close();
           else setOpen(true);
         }}
-        className="group relative flex size-[4.5rem] items-center justify-center rounded-full border-2 border-gold bg-white p-1.5 shadow-xl transition-transform hover:scale-105 focus-visible:outline-4 focus-visible:outline-accent"
+        className={
+          "group relative size-[4.5rem] items-center justify-center rounded-full border-2 border-gold bg-white p-1.5 shadow-xl transition-transform hover:scale-105 focus-visible:outline-4 focus-visible:outline-accent " +
+          (open ? "hidden sm:flex" : "flex")
+        }
       >
         <img
           src={avatar[phase]}

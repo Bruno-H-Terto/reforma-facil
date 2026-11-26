@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("chat flutuante abre, responde e muda a expressão do Reforminha", async ({
   page,
+  isMobile,
 }) => {
   await page.route("**/api/chat", async (route) => {
     await new Promise((resolve) => setTimeout(resolve, 800));
@@ -39,15 +40,19 @@ test("chat flutuante abre, responde e muda a expressão do Reforminha", async ({
   const openLauncher = page.getByRole("button", {
     name: "Recolher chat do Reforminha",
   });
-  await expect(
-    openLauncher.locator('img[src="/images/mascot/chat-thinking.webp"]'),
-  ).toBeVisible();
+  if (!isMobile) {
+    await expect(
+      openLauncher.locator('img[src="/images/mascot/chat-thinking.webp"]'),
+    ).toBeVisible();
+  }
   await expect(
     dialog.getByText(/Consulte o guia e a aba Simples Nacional/),
   ).toBeVisible();
-  await expect(
-    openLauncher.locator('img[src="/images/mascot/chat-speaking.webp"]'),
-  ).toBeVisible();
+  if (!isMobile) {
+    await expect(
+      openLauncher.locator('img[src="/images/mascot/chat-speaking.webp"]'),
+    ).toBeVisible();
+  }
 
   await dialog.getByRole("button", { name: "Nova conversa" }).click();
   await expect(dialog.getByText(/Olá! Sou o Reforminha/)).toBeVisible();
@@ -172,4 +177,42 @@ test("exemplo de Function Calling oferece link clicável para o simulador", asyn
     "aria-selected",
     "true",
   );
+});
+
+test("chat ocupa a viewport no celular e mantém dimensão flutuante no desktop", async ({
+  page,
+  isMobile,
+}) => {
+  await page.goto("/");
+  await page
+    .getByRole("button", { name: "Conversar com o Reforminha" })
+    .click();
+  const dialog = page.getByRole("dialog", {
+    name: "Conversa com o Reforminha",
+  });
+  await expect(dialog).toBeVisible();
+  const bounds = await dialog.boundingBox();
+  const viewport = page.viewportSize();
+  expect(bounds).not.toBeNull();
+  expect(viewport).not.toBeNull();
+  if (isMobile) {
+    expect(bounds!.x).toBeCloseTo(0, 0);
+    expect(bounds!.y).toBeCloseTo(0, 0);
+    expect(bounds!.width).toBeCloseTo(viewport!.width, 0);
+    expect(bounds!.height).toBeCloseTo(viewport!.height, 0);
+    await expect(
+      page.getByRole("button", { name: "Recolher chat do Reforminha" }),
+    ).toBeHidden();
+  } else {
+    expect(bounds!.width).toBeLessThan(viewport!.width);
+    expect(bounds!.height).toBeLessThan(viewport!.height);
+    await expect(
+      page.getByRole("button", { name: "Recolher chat do Reforminha" }),
+    ).toBeVisible();
+  }
+  await dialog.getByRole("button", { name: "Fechar conversa" }).click();
+  await expect(dialog).not.toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Conversar com o Reforminha" }),
+  ).toBeVisible();
 });
